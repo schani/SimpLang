@@ -14,7 +14,7 @@ They are there to make parsing and later extension easier.
 		loop acc = 1 and
 			 i = 2
 		in
-			if i > n then
+			if n < i then
         		acc
       		else
 				recur (acc * i) (i + 1)
@@ -68,13 +68,19 @@ definitions.
 
 These are all the operators, in order of precedence:
 
-	and, or
+	&&, ||
 	not
-	<, >, <=, >=, ==
-	+, -
-	*, /
+	<, ==
+	+
+	*
+	- (unary)
 
 `and` and `or` are logical operators, using shortcut evaluation.  That
 means `and` will not evaluate its right hand side if the left hand
 side evaluates to `0`, and `or` will only evaluate its right hand side
 if its left hand side evaluates to `0`.
+
+# Syntax
+
+Identifiers can contain only letters, digits, and the underscore, but
+cannot start with a digit.
