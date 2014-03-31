@@ -54,7 +54,6 @@ also gives `2`, because the first `a` in the inner `let` hides the
 outer `a`.
 
 `if` works as expected.  It must have both `then` and `else` clauses.
-It considers a value to be false when it is `0`, otherwise true.
 
 `loop` introduces variable bindings like `let`, but it also provides a
 jump target for uses of `recur` in the body.  `recur` invocations jump
@@ -63,6 +62,12 @@ the bound variables.
 
 Functions can only be used in their own definitions or in later
 definitions.
+
+# Values
+
+`if` and all logical operators consider `0` to be false, all other
+values to be true.  Logical operators return `0` for false and `1` for
+true.
 
 # Operators
 
