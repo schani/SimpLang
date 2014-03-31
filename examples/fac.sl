@@ -1,4 +1,4 @@
-def fac n =
+let fac n =
 	loop acc = 1 and
 		 i = 2
 	in
@@ -10,6 +10,6 @@ def fac n =
 	end
 end
 
-def main n =
+let main n =
 	fac n
 end

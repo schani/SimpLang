@@ -10,7 +10,7 @@ They are there to make parsing and later extension easier.
 
 # Example program
 
-	def fac n =
+	let fac n =
 		loop acc = 1 and
 			 i = 2
 		in
@@ -22,7 +22,7 @@ They are there to make parsing and later extension easier.
 		end
 	end
 
-	def main n =
+	let main n =
 		fac n
 	end
 
