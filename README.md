@@ -66,21 +66,29 @@ definitions.
 
 # Operators
 
-These are all the operators, in order of precedence:
+These are all the operators, in increasing order of precedence:
 
 	&&, ||
-	not
+	!
 	<, ==
 	+
 	*
 	- (unary)
+	function application
 
-`and` and `or` are logical operators, using shortcut evaluation.  That
-means `and` will not evaluate its right hand side if the left hand
-side evaluates to `0`, and `or` will only evaluate its right hand side
-if its left hand side evaluates to `0`.
+`&&` and `||` are logical operators, using shortcut evaluation.  That
+means `&&` will not evaluate its right hand side if the left hand side
+evaluates to `0`, and `||` will only evaluate its right hand side if
+its left hand side evaluates to `0`.
+
+# Miscellaneous
+
+Functions must take at least one argument.
 
 # Syntax
 
 Identifiers can contain only letters, digits, and the underscore, but
 cannot start with a digit.
+
+Function calls use ML/Haskell syntax: Function name followed by
+arguments.
