@@ -60,6 +60,12 @@ jump target for uses of `recur` in the body.  `recur` invocations jump
 to the innermost `loop` containing that `recur`, giving new values to
 the bound variables.
 
+`recur` is only legal within a `loop` and can only occur in a tail
+position, i.e., where the continuation is the same as the continuation
+of the containing `loop`.  In particular, a `recur` can never be the
+condition of an `if`, an argument in a function call, an operand to an
+operator, the right hand side of a `let` or `loop` binding.
+
 Functions can only be used in their own definitions or in later
 definitions.
 
