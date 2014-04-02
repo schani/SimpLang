@@ -11,5 +11,5 @@ let fac n =
 end
 
 let main n =
-	fac n
+	fac (n)
 end

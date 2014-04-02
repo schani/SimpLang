@@ -23,7 +23,7 @@ They are there to make parsing and later extension easier.
 	end
 
 	let main n =
-		fac n
+		fac (n)
 	end
 
 # Control constructs
@@ -68,6 +68,17 @@ operator, the right hand side of a `let` or `loop` binding.
 
 Functions can only be used in their own definitions or in later
 definitions.
+
+All arguments to function calls and `recur` must be parenthesized,
+i.e.,
+
+    recur (a) (-b)
+
+is legal, while
+
+    recur a -b
+
+is not.
 
 # Values
 
