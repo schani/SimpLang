@@ -1,9 +1,9 @@
 SimpLang - A Simple Language
 ============================
 
-All values are integers.  All global definitions are functions.  Calls
-are not tail recursive.  All functions return values.  Functions are
-not first class.
+All values are signed 64 bit integers.  All global definitions are
+functions.  Calls are not tail recursive.  All functions return
+values.  Functions are not first class.
 
 Some pieces in the language grammar, like `end`, are superfluous.
 They are there to make parsing and later extension easier.
