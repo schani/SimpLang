@@ -114,3 +114,10 @@ cannot start with a digit.
 
 Function calls use ML/Haskell syntax: Function name followed by
 arguments.
+
+# Tests
+
+Run the testsuite with
+
+    cd tests ; ./test.py EXE-FILENAME
+ 
