@@ -22,14 +22,15 @@ def readtest (f):
     result = readnumbers (f) [0]
     return (args, result)
 
-if len (sys.argv) != 2:
-    sys.stderr.write ("Usage: %s EXE-FILE\n" % sys.argv [0])
+if len (sys.argv) < 2:
+    sys.stderr.write ("Usage: %s EXE-FILE [ARGS]\n" % sys.argv [0])
     exit (1)
 
 num_tests = 0
 failed_tests = 0
 
 exe = sys.argv [1]
+flags = sys.argv [2:]
 for fn in os.listdir ('.'):
     if not os.path.isfile (fn):
         continue
@@ -46,7 +47,7 @@ for fn in os.listdir ('.'):
         num_tests += 1
         (args, expected) = test
         print args, expected
-        result = int (subprocess.check_output (['mono', exe, slname] + [str (x) for x in args]))
+        result = int (subprocess.check_output (['mono', exe] + flags + [slname] + [str (x) for x in args]))
         if result != expected:
             print "Failure on %s with %s: expected %d, got %d" % (fn, args, expected, result)
             failed_tests += 1
