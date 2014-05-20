@@ -1,14 +1,3 @@
-let bitset x i =
-  loop x = x and
-       i = i in
-    if i < 63 then
-      recur (x*2) (i+1)
-    else
-      x < 0
-    end
-  end
-end
-
 let shiftl x a =
   loop x = x and
        i = 0 in
@@ -16,17 +5,6 @@ let shiftl x a =
       recur (x*2) (i+1)
     else
       x
-    end
-  end
-end
-
-let shiftr x a =
-  loop r = 0 and
-       i = 0 in
-    if a+i < 64 then
-      recur (r + shiftl (bitset (x) (a+i)) (i)) (i+1)
-    else
-      r
     end
   end
 end
@@ -44,11 +22,7 @@ let leadingzeros x =
 end
 
 let sign x =
-  if x < 0 then
-    -1
-  else
-    !!x
-  end
+  (0 < x) +- (x < 0)
 end
 
 let div x y =
