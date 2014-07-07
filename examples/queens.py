@@ -7,11 +7,13 @@ assert len (sys.argv) == 3
 n = int (sys.argv [1])
 board = int (sys.argv [2])
 
+
 def queen (x):
-    return (board >> (x*4)) & 15
+    return (board >> (x * 4)) & 15
+
 
 def hline ():
-    return '---'.join (['+' for x in range (n+1)])
+    return '---'.join (['+' for x in range (n + 1)])
 
 for y in range (n):
     print hline ()
