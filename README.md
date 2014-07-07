@@ -33,7 +33,7 @@ right hand sides of later bindings in the same `let` expression and
 the body of the `let` expression.  Later bindings can hide earlier
 ones:
 
-    let a = 1
+    let a = 1 and
 		b = a + 1
 	in
 		b
@@ -43,7 +43,7 @@ gives `2`.
 
 	let a = 31415
 	in
-		let a = 1
+		let a = 1 and
 			a = a + 1
 		in
 			a
@@ -120,4 +120,3 @@ arguments.
 Run the testsuite with
 
     cd tests ; ./test.py EXE-FILENAME
- 
