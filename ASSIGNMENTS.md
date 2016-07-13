@@ -52,3 +52,57 @@ Expected output:
 	keyword end
 
 More example inputs are in the `examples` folder.
+
+## Assignment 1.2
+
+Write a parser for `if` expressions.  The grammar to be recognized is
+this (in [BNF](https://en.wikipedia.org/wiki/Extended_Backus–Naur_Form)):
+
+    expr = integer
+         | "if" expr "then" expr "else" expr "end"
+
+
+The output must show the structure of the input via indentation.  A
+few examples:
+
+Input:
+
+    123
+
+Output:
+
+    123
+
+Input:
+
+    if 1 then 2 else 3 end
+
+Output:
+
+    if
+      1
+	  2
+	  3
+
+Input:
+
+    if if 1 then 2 else 3 end then 4 else if 5 then 6 else 7 end end
+
+Output:
+
+    if
+      if
+	    1
+	    2
+		3
+      4
+	  if
+	    5
+	    6
+		7
+
+To work towards an interpreter and compiler it is beneficial to first
+parse the input into an intermediate data structure (an
+[abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)),
+and then generate the output from that tree, instead of generating the
+output directly while parsing.
