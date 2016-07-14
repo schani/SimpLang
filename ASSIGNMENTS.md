@@ -10,8 +10,10 @@ Incorrect programs may lead to arbitrary results, including crashes.
 ## Assignment 1.1
 
 Write a lexical analyzer.  It reads a file as input and outputs one
-line per token.  All whitespace in the input file is ignored.  Each
-line in the output has two parts, separated by a space:
+line per token.  All whitespace in the input file is ignored, apart
+from separating tokens that would otherwise be single tokens.
+
+Each line in the output has two parts, separated by a space:
 
 1. The type of token.  This can be `keyword`, `identifier`,
    `operator`, or `integer`.
@@ -29,9 +31,9 @@ The analyzer is not expected to handle incorrect input.
 Example input:
 
     let a = 1 and
-		b = a+-1
+		loopy = a+-1
 	in
-		b
+		loopy
 	end
 
 Expected output:
@@ -41,15 +43,20 @@ Expected output:
 	operator =
 	integer 1
 	keyword and
-	identifier b
+	identifier loopy
 	operator =
 	identifier a
 	operator +
 	operator -
 	integer 1
 	keyword in
-	identifier b
+	identifier loopy
 	keyword end
+
+Note that tokens need not be separated by spaces, like `a+-1` in the
+example above, which is four separate tokens.  Also note that
+identifiers can "contain" keywords, like `loopy` above, which is not
+the keyword `loop` and the identifier `y`, but just one identifier.
 
 More example inputs are in the `examples` folder.
 
