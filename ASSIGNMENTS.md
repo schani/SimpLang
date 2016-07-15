@@ -113,3 +113,86 @@ parse the input into an intermediate data structure (an
 [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)),
 and then generate the output from that tree, instead of generating the
 output directly while parsing.
+
+## Assignment 1.3
+
+Write an interpreter for the integer and `if` expressions from
+assignment 1.2.  An integer evaluates to its value.  An `if`
+expression evaluates to its `else` expression if its condition
+evaluates to zero, otherwise to its `then` expression.
+
+Input:
+
+    123
+
+Output:
+
+    123
+
+Input:
+
+	if 8 then 1 else 2 end
+
+Output:
+
+    1
+
+Input:
+
+	if 0 then 1 else 2 end
+
+Output:
+
+	2
+
+Input:
+
+	if
+	  if 1 then 0 else 1 end
+    then
+	  123
+    else
+	  if 8 then 3 else 4 end
+    end
+
+Output:
+
+	3
+
+## Assignment 1.4
+
+Extend the parser to recognize operators, without yet implementing
+operator precedence.  For now we require that binary operator
+expressions are always parenthesized.  The grammar is now:
+
+    expr = integer
+         | "if" expr "then" expr "else" expr "end"
+		 | unop expr
+		 | "(" expr binop expr ")"
+    unop = "!" | "-"
+	binop = "&&" | "||" | "<" | "==" | "+" | "*"
+
+Input:
+
+    if (1<2) then (3*4) else (5+!-if 7 then 8 else 9 end) end
+
+Output:
+
+    if
+	  <
+	    1
+		2
+	  *
+	    3
+		4
+	  +
+	    5
+		!
+		  -
+		    if
+		      7
+			  8
+			  9
+
+Again, parse to an abstract syntax tree first, then generate the
+output from the AST.  That will make the next assignment easier.
