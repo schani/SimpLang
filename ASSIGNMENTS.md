@@ -9,9 +9,10 @@ Incorrect programs may lead to arbitrary results, including crashes.
 
 ## Assignment 1.1
 
-Write a lexical analyzer.  It reads a file as input and outputs one
-line per token.  All whitespace in the input file is ignored, apart
-from separating tokens that would otherwise be single tokens.
+Write a lexical analyzer (also called "scanner" or "tokenizer").  It
+reads a file as input and outputs one line per token.  All whitespace
+in the input file is ignored, apart from when it separates tokens that
+would otherwise be a single token.
 
 Each line in the output has two parts, separated by a space:
 
@@ -112,12 +113,13 @@ To work towards an interpreter and compiler it is beneficial to first
 parse the input into an intermediate data structure (an
 [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)),
 and then generate the output from that tree, instead of generating the
-output directly while parsing.
+output directly while parsing.  I recommend writing a
+[recursive descent parser](https://en.wikipedia.org/wiki/Recursive_descent_parser).
 
 ## Assignment 1.3
 
-Write an interpreter for the integer and `if` expressions from
-assignment 1.2.  An integer evaluates to its value.  An `if`
+Write an interpreter for the expressions with integers and `if` from
+the previous assignment.  An integer evaluates to its value.  An `if`
 expression evaluates to its `else` expression if its condition
 evaluates to zero, otherwise to its `then` expression.
 
@@ -274,6 +276,10 @@ as expressions.  The grammar is now:
     unop = "!" | "-"
 	binop = "&&" | "||" | "<" | "==" | "+" | "*"
 
+The curly braces in the grammar mean that the enclosed sequence can be
+repeated zero or more times, so `x {"and" x}` means `x` or `x "and" x`
+or `x "and" x "and" x`, and so on.
+
 ## Assignment 1.7
 
 Extend the interpreter to handle `let`.
@@ -292,18 +298,38 @@ Output:
 
 Input:
 
-	-let a = 31415
+	-let a = 10
 	in
-		let a = 1 and
+		(let a = 1 and
 			a = (a + 1)
 		in
 			a
-		end
+		end + a)
 	end
 
 Output:
 
-	-2
+	-12
+
+Note that in this example there are three different bindings for `a`,
+each with a different scope.  We can rename them to get an expression
+with the same semantics, to make clear which one is which:
+
+	-let a1 = 10
+	in
+		(let a2 = 1 and
+			a3 = (a2 + 1)
+		in
+			a3
+		end + a1)
+	end
+
+Your recursive interpretation function will now require not only the
+AST to evaluate, but also the "environment" in which to evaluate it
+in.  The environment contains the variable bindings.  For example, the
+expression `(a+b)` evalutes to `3` in the environment `{a=>1, b=>2}`,
+but to `7` in the environment `{a=>3,b=>4}`.  Think about what data
+structure to use for the environment before starting to code.
 
 ## Assignment 1.8
 
@@ -335,7 +361,7 @@ For example:
 	    if (a == 0) then
 	        b
 		else
-			recur (a+-1) (b+1)
+			recur ((a+-1)) ((b+1))
 		end
 	end
 
@@ -362,10 +388,148 @@ Input:
 		if (n == 1) then
 			fac
 		else
-			recur (n+-1) (fac*n)
+			recur ((n+-1)) ((fac*n))
 		end
 	end
 
 Output:
 
 	3628800
+
+The double parentheses look a little weird here, but they're necessary
+because our grammar is still a bit simplified.  We'll fix that in the
+next assignment.
+
+Make sure that you really handle short-circuit evaluation of `&&` and
+`||`.  This expression:
+
+    (0 && loop x=1 in recur (x) end)
+
+must produce `0`, and not loop infinitely.  The same goes for `if`:
+
+    if 1 then 1 else loop x=1 in recur (x) end end
+
+must produce `1`.
+
+## Assignment 1.10
+
+Implement operator precendence in the parser.  The grammar changes a
+little to:
+
+	expr = primary {binop primary}
+	primary = integer
+	        | ident
+            | "if" expr "then" expr "else" expr "end"
+		    | ("let" | "loop") bindings "in" expr "end"
+		    | "recur" arg {arg}
+		    | unop primary
+	        | "(" expr ")"
+	bindings = binding {"and" binding}
+	binding = ident "=" expr
+	arg = "(" expr ")"
+    unop = "!" | "-"
+	binop = "&&" | "||" | "<" | "==" | "+" | "*"
+
+Now when you parse an expression you can end up with a list of
+primaries, separated by binary operators, and you'll have to build a
+tree out of that, according to operator precendence.  Here are all the
+binary operators, in increasing order of precedence:
+
+	&&, ||
+	<, ==
+	+
+	*
+
+All operators associate left to right, i.e. `a<b<c` is equivalent to
+`(a<b)<c`, as opposed to `a<(b<c)`.  Precendence means that `a+b*c` is
+equivalent to `a+(b*c)`, i.e. `*` has higher "priority".  One way to
+implement precendence is the
+[shunting yard algorithm](https://en.wikipedia.org/wiki/Shunting-yard_algorithm),
+but there is a more straightforward way you might discover.
+
+Make sure your interpreter works with the parser changes.  Depending
+on how you designed your AST, you might not have to change it at all
+to make it work with this improved parser.
+
+We can now write the factorial implementation from the last assignment
+without the double parentheses:
+
+    loop n = 10 and
+         fac = 1
+	in
+		if n == 1 then
+			fac
+		else
+			recur (n+-1) (fac*n)
+		end
+	end
+
+## Assignment 1.11
+
+Extend the parser to recognize a single function.  We're adding these
+rules to our grammar:
+
+    function = "let" ident params "=" expr "end"
+    params = ident {ident}
+
+The top-level rule is now `function`, so we can parse
+
+    let main n =
+		loop n = n and
+			 fac = 1
+		in
+			if n == 1 then
+				fac
+			else
+				recur (n+-1) (fac*n)
+			end
+	    end
+	end
+
+## Assignment 1.12
+
+Make your interpreter run the `main` function and pass command line
+arguments in as the arguments to `main`.  If you run
+
+    python my-interpreter.py examples/add.sl 1 2
+
+it should output
+
+	3
+
+To run the function all you should have to do is to make an
+environment that contains bindings for all the arguments, and then
+evaluate the body with that environment.
+
+## Assignment 1.13
+
+We are missing one last thing, and that's being able to define
+multiple functions and to call them.  Extend your parser to the final
+grammar:
+
+	program = function {function}
+    function = "let" ident params "=" expr "end"
+    params = ident {ident}
+	expr = primary {binop primary}
+	primary = integer
+	        | ident
+            | "if" expr "then" expr "else" expr "end"
+		    | ("let" | "loop") bindings "in" expr "end"
+		    | ("recur" | ident) arg {arg}
+		    | unop primary
+	        | "(" expr ")"
+	bindings = binding {"and" binding}
+	binding = ident "=" expr
+	arg = "(" expr ")"
+    unop = "!" | "-"
+	binop = "&&" | "||" | "<" | "==" | "+" | "*"
+
+## Assignment 1.14
+
+Extend the interpreter to correctly process function calls.  In
+assignment 1.12 you already wrote code to call a function, so all you
+need to do now when a function is to be called is to find out which
+one it is, via its name.
+
+Your interpreter should now be able to run all the programs in the
+`examples` folder.  Congratulations, you've completed assignment 1!
