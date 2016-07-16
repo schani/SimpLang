@@ -196,3 +196,176 @@ Output:
 
 Again, parse to an abstract syntax tree first, then generate the
 output from the AST.  That will make the next assignment easier.
+
+## Assignment 1.5
+
+Extend the interpreter to handle the operators.  Note that all values
+are 64 bit signed integers, using two's complement arithmetic.
+Overflow is not handled, i.e. if it occurs, the result is whatever
+fits into 64 bits.  In Python this can be implemented easily by using
+the `numpy.int64` type.
+
+Here's how the operators work:
+
+* `!`_x_ is `1` if _x_ is `0`.  It's `0` if _x_ is not `0`.
+
+* `-`_x_ is the arithmetic negation of _x_.
+
+* _x_`&&`_y_ is `0` if either _x_ or _y_ are `0`, otherwise `1`.  Note that we will later need
+  [short-circuit evaluation](https://en.wikipedia.org/wiki/Short-circuit_evaluation),
+  so if _x_ is `0`, don't evaluate _y_.
+
+* _x_`||`_y_ is `0` if both _x_ and _y_ are `0`, otherwise `1`.
+  Short-circuit evaluation applies here, too.
+
+* _x_`<`_y_ is `1` if _x_ is less than _y_, otherwise `0`.
+
+* _x_`==`_y_ is `1` if _x_ is equal to _y_, otherwise `0`.
+
+* _x_`+`_y_ is the sum of _x_ and _y_.
+
+* _x_`*`_y_ is the product of _x_ and _y_.
+
+Input:
+
+    (9223372036854775807+1)
+
+Output:
+
+    -9223372036854775808
+
+Input:
+
+	((9223372036854775807+1)*2)
+
+Output:
+
+	0
+
+Input:
+
+	((1 && 2) + (0 || 3))
+
+Output:
+
+	2
+
+Input:
+
+    !!123
+
+Output:
+
+	1
+
+## Assignment 1.6
+
+Extend the parser to parse `let` constructs, and to allow identifiers
+as expressions.  The grammar is now:
+
+	expr = integer
+		 | ident
+         | "if" expr "then" expr "else" expr "end"
+		 | "let" bindings "in" expr "end"
+		 | unop expr
+		 | "(" expr binop expr ")"
+	bindings = binding {"and" binding}
+	binding = ident "=" expr
+    unop = "!" | "-"
+	binop = "&&" | "||" | "<" | "==" | "+" | "*"
+
+## Assignment 1.7
+
+Extend the interpreter to handle `let`.
+
+Input:
+
+    let a = 1 and
+        b = (a + 1)
+	in
+	    (a + b)
+	end
+
+Output:
+
+	3
+
+Input:
+
+	-let a = 31415
+	in
+		let a = 1 and
+			a = (a + 1)
+		in
+			a
+		end
+	end
+
+Output:
+
+	-2
+
+## Assignment 1.8
+
+Extend the parser to recognize `loop` and `recur`.  The grammar is
+now:
+
+	expr = integer
+		 | ident
+         | "if" expr "then" expr "else" expr "end"
+		 | ("let" | "loop") bindings "in" expr "end"
+		 | "recur" arg {arg}
+		 | unop expr
+		 | "(" expr binop expr ")"
+	bindings = binding {"and" binding}
+	binding = ident "=" expr
+	arg = "(" expr ")"
+    unop = "!" | "-"
+	binop = "&&" | "||" | "<" | "==" | "+" | "*"
+
+## Assignment 1.9
+
+Extend the interpreter to handle `loop` and `recur`.  Note that
+running a loop must not consume more memory the more often it recurs.
+For example:
+
+    loop a = 100 and
+		 b = 0
+	in
+	    if (a == 0) then
+	        b
+		else
+			recur (a+-1) (b+1)
+		end
+	end
+
+gives
+
+    100
+
+If instead `a` is initialized with `1000000` it must not use more
+memory than, as above, with `100`.
+
+The easiest way to achieve this, with a recursive interpreter, is to
+let the interpretation function return either a result, or a value
+that indicates that the innermost `loop` is to be rerun, including the
+new values to be bound.
+
+See the [README](README.md) on details of which positions `recur` can
+be used in.
+
+Input:
+
+    loop n = 10 and
+         fac = 1
+	in
+		if (n == 1) then
+			fac
+		else
+			recur (n+-1) (fac*n)
+		end
+	end
+
+Output:
+
+	3628800
