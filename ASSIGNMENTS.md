@@ -486,6 +486,12 @@ The top-level rule is now `function`, so we can parse
 	    end
 	end
 
+Since the top-level rule is `function` now, all the examples before
+this assignment won't work anymore (because they're not contained
+within a function).  That's ok.  If you'd like to still be able to use
+those examples, you should preserve the ability to parse an `expr`
+that's not contained in a function.
+
 ## Assignment 1.12
 
 Make your interpreter run the `main` function and pass command line
@@ -500,6 +506,11 @@ it should output
 To run the function all you should have to do is to make an
 environment that contains bindings for all the arguments, and then
 evaluate the body with that environment.
+
+If you want your interpreter to also run function-less expressions,
+like all the examples before assignment 1.11, you could do it by
+parsing an `expr` if no function arguments are given on the command
+line.
 
 ## Assignment 1.13
 
@@ -527,8 +538,8 @@ grammar:
 ## Assignment 1.14
 
 Extend the interpreter to correctly process function calls.  In
-assignment 1.12 you already wrote code to call a function, so all you
-need to do now when a function is to be called is to find out which
+assignment 1.12 you already wrote code to call a function.  All you
+need to do now, when a function is to be called, is to find out which
 one it is, via its name.
 
 Your interpreter should now be able to run all the programs in the
