@@ -544,3 +544,7 @@ one it is, via its name.
 
 Your interpreter should now be able to run all the programs in the
 `examples` folder.  Congratulations, you've completed assignment 1!
+
+# Assignment 2
+
+Write an interpreter for the virtual machine.
