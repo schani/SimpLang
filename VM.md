@@ -145,3 +145,114 @@ back to whoever called our function.  That's what the `Return`
 instruction is for:
 
     14    Return $0
+
+To finish off, let's write a loop that will call this function four
+times on the result we got from instruction `3`, above.  On the last
+stack diagram we see that our intermediate result is in `$0`.  We
+won't need the `10` in `$1` anymore, so we can overwrite it if we have
+to.  We will need to keep the loop count in a stack slot, but we can't
+use `$1` for that: we saw that when a function is called, everything
+above the arguments it is passed must be assumed to be overwritten by
+the function.  If we use `$0` as the function argument, and use `$1`
+for the loop counter, the loop counter will be overwritten every time
+we call the function, which is obviously not what we want.  So we'll
+use `$0` as the loop counter, and `$1` as the intermediate result,
+which is also the function argument.  It follows that we need to move
+the number in `$0` to `$1`, and then set `$0` to the loop counter,
+`4`:
+
+     4    Move $1, $0
+     5    Set $0, 4
+
+Here's what our stack looks like now:
+
+      ...     |  ... |
+	   $2     |    0 |
+       $1     | 1378 |
+       $0     |    4 |    <--- value stack pointer
+       $-1    |  789 |
+       $-2    |  456 |
+       $-3    |  123 |
+              +------+
+
+Now we can call our function:
+
+     6    Call 12, 2, $1
+
+The `Call` instruction takes three arguments:
+
+* The index of the first instruction of the function to call, in our
+  case `12`.
+
+* The number to be added to the value stack pointer.  This is how `$1`
+  from the caller's perspective ends up as `$-1` from the called
+  function's perspective, because we pass `2`.
+
+* The slot where the result of the function should be stored in.
+
+The immediate effects of the `Call` instruction are that it first
+pushes the current program counter, `6`, onto the call stack.  Then it
+sets the program counter to the called function's instruction index,
+`12`.  Finally, it adds an offset, `2`, to the value stack pointer.
+The contents of the value array are still the same, but the value
+stack pointer has moved up two slots:
+
+      ...     |  ... |
+	   $0     |    0 |    <--- value stack pointer
+       $-1    | 1378 |
+       $-2    |    4 |
+       $-3    |  789 |
+       $-4    |  456 |
+       $-5    |  123 |
+              +------+
+
+This is where our function executes now.  It finds its argument,
+`1378`, in slot `$-1`.  When it finishes, it will return that number
+times `5`, i.e., `6890`.  The `Call` instruction specifies that the
+function result should be stored in slot `$1` (from the caller's
+perspective), so that is what happens:
+
+      ...     |  ... |
+	   $3     |  ??? |
+	   $2     |  ??? |
+       $1     | 6890 |
+       $0     |    4 |    <--- value stack pointer
+       $-1    |  789 |
+       $-2    |  456 |
+       $-3    |  123 |
+              +------+
+
+Note that the value stack pointer is back where it was before the
+call.  Note also that the stack slots above `$1` are now marked with
+`???`.  This signifies that the caller must not assume that they
+contain the same values as they did before the call, or any useful
+value at all, for that matter.  That is part of the convention between
+caller and called function (callee).  The `Return` instruction knows
+where to return to, how to restore the value stack pointer, and which
+slot to put the result in, because it pops off the corresponding
+`Call` instruction's index from the call stack.
+
+Now we need to decrement the loop counter and, if it's not zero,
+repeat the loop.  We decrement by adding `-1`, which we first have to
+store somewhere.  We'll use `$2`:
+
+     7    Set $2, -1
+     8    Add $0, $0, $2
+
+Now, if `$0` is not zero, we must repeat the loop, i.e., jump back to
+instruction `6`.  We don't have an instruction to jump if not zero,
+but we have the instructions `JumpIfZero`, and `Jump`, which we can
+employ:
+
+     9    JumpIfZero $0, 11
+    10    Jump 6
+
+If `$0` is zero, we jump to instruction `11`.  If `$0` is not zero we
+continue straight down to `10`, which jumps back to `6`, which is what
+we want.  We end up in `11` when our loop is finished, at which point
+we want to end the program and return the result that's in `$1`:
+
+    11    Return $1
+
+Note that there was never a `Call` corresponding to this `Return`.
+When the "main" program returns, the program ends.
