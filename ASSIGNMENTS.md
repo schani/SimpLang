@@ -548,3 +548,31 @@ Your interpreter should now be able to run all the programs in the
 # Assignment 2
 
 Write an interpreter for the virtual machine.
+
+## Assignment 2.1
+
+Identify which operations you need to implement for the value array
+and the value stack pointer: go through all VM instructions and check
+how they operate with the value array and the value stack pointer.
+
+Implement a value array and value stack pointer that support those
+operations.  Write a few simple tests to make sure they work.
+
+## Assignment 2.2
+
+Implement a simple program that takes as command line arguments one or
+more numbers, puts them on the value stack array, sets the value stack
+pointer accordingly (i.e. to point to the slot after the numbers, like
+in the VM description), and then does the effect of the instruction
+
+     0    Add $0, $-3, $-2
+
+using the operations implemented in previous assignment.  Note that
+you don't have to parse the instruction, just write Python code that
+operates on the value array like that instruction would.  Then print
+the value array, to make sure you got the correct result.
+
+## Assignment 2.3
+
+Write a parser for VM files.  See the syntax section and the example
+code in the VM documentation.

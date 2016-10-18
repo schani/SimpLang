@@ -328,3 +328,13 @@ sets the slot *DST* to `1`, otherwise to `0`.
 
 If the number in slot *SRC1* is the same as the one in *SRC2*, sets
 the slot *DST* to `1`, otherwise to `0`.
+
+## Syntax
+
+Each line is an instruction.  Within the line, white space and commas
+act as separators.  The first element in each line is the line number,
+which must be ignored (it's only there to make reading VM code
+easier).  The second line is the name of the instruction, then follow
+the arguments.  Numbers are sequences of digits, optionally prefixed
+by a minus sign.  Slots are numbers prefixed by a dollar sign.
+Instruction indexes are numbers.
