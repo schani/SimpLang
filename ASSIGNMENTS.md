@@ -565,7 +565,7 @@ more numbers, puts them on the value stack array, sets the value stack
 pointer accordingly (i.e. to point to the slot after the numbers, like
 in the VM description), and then does the effect of the instruction
 
-     0    Add $0, $-3, $-2
+    0    Add $0, $-3, $-2
 
 using the operations implemented in previous assignment.  Note that
 you don't have to parse the instruction, just write Python code that
@@ -575,4 +575,59 @@ the value array, to make sure you got the correct result.
 ## Assignment 2.3
 
 Write a parser for VM files.  See the syntax section and the example
-code in the VM documentation.
+code in the VM documentation.  Figure out a representation that will
+make interpreting easy.
+
+Here's how you can split an instruction line into its components:
+
+    import re
+    re.split("[\\s,]+", line.strip())
+
+## Assignment 2.4
+
+Implement an interpreter for the instructions `Add` and `Set`.  Also
+implement `Return`, but make it end the program right away and print
+the result, i.e. don't worry about the call stack yet.
+
+Parse and interpret this program:
+
+    0    Add $0, $-3, $-2
+    1    Add $0, $-1, $0
+    2    Set $1, 10
+    3    Add $0, $0, $1
+	4    Return $0
+
+It takes three arguments.  If you give it the numbers `123`, `456`,
+and `789`, the result it prints should be `1378`.
+
+## Assignment 2.5
+
+Implement all the other instructions that only operate on the value
+array: `Move`, `Multiply`, `Negate`, `LessThan`, `Equals`.  Write one
+or more test programs to check that they work.
+
+## Assignment 2.6
+
+Implement `Jump` and `JumpIfZero`.  This program takes one argument
+and should return the argument's factorial:
+
+    0   Set $0, 1
+    1   Set $1, 2
+    2   LessThan $2, $-1, $1
+    3   JumpIfZero $2, 5
+    4   Return $0
+    5   Multiply  $0, $0, $1
+    6   Set $3, 1
+    7   Add $1, $1, $3
+    8   Jump 2
+
+## Assignment 2.7
+
+Implement `Call` and `Return`, with a call stack.  Most of the work is
+done by the `Return` instruction, which also has to look at the `Call`
+instruction it returns to, to determine how much it has to adjust the
+value stack pointer, and which slot to store the result in.
+
+Your VM is now complete.  Try it out with
+`examples/nextprime-simple.sbc`.  It takes one arguments and produces
+the next prime number after that number.

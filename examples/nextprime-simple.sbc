@@ -1,0 +1,183 @@
+   0 Jump        180
+   1 Move        $1, $-2
+   2 Move        $2, $-1
+   3 Set         $4, 63
+   4 LessThan    $3, $2, $4
+   5 JumpIfZero  $3, 12
+   6 Set         $3, 2
+   7 Multiply    $1, $1, $3
+   8 Set         $3, 1
+   9 Add         $2, $2, $3
+  10 Jump        3
+  11 Jump        14
+  12 Set         $3, 0
+  13 LessThan    $0, $1, $3
+  14 Return      $0
+  15 Move        $1, $-2
+  16 Set         $2, 0
+  17 LessThan    $3, $2, $-1
+  18 JumpIfZero  $3, 25
+  19 Set         $3, 2
+  20 Multiply    $1, $1, $3
+  21 Set         $3, 1
+  22 Add         $2, $2, $3
+  23 Jump        17
+  24 Jump        26
+  25 Return      $1
+  26 Return      $0
+  27 Set         $1, 0
+  28 Set         $2, 0
+  29 Add         $4, $-1, $2
+  30 Set         $5, 64
+  31 LessThan    $3, $4, $5
+  32 JumpIfZero  $3, 43
+  33 Move        $6, $-2
+  34 Add         $7, $-1, $2
+  35 Call        1, 8, $4
+  36 Move        $5, $2
+  37 Call        15, 6, $3
+  38 Add         $1, $1, $3
+  39 Set         $3, 1
+  40 Add         $2, $2, $3
+  41 Jump        29
+  42 Jump        44
+  43 Return      $1
+  44 Return      $0
+  45 Set         $2, 0
+  46 Equals      $1, $-1, $2
+  47 JumpIfZero  $1, 50
+  48 Set         $0, 64
+  49 Jump        60
+  50 Set         $2, 0
+  51 LessThan    $1, $-1, $2
+  52 JumpIfZero  $1, 55
+  53 Set         $0, 0
+  54 Jump        60
+  55 Set         $3, 2
+  56 Multiply    $2, $-1, $3
+  57 Call        45, 3, $1
+  58 Set         $2, 1
+  59 Add         $0, $1, $2
+  60 Return      $0
+  61 Set         $2, 0
+  62 Equals      $1, $-1, $2
+  63 JumpIfZero  $1, 66
+  64 Set         $0, 0
+  65 Jump        72
+  66 Set         $2, 0
+  67 LessThan    $1, $-1, $2
+  68 JumpIfZero  $1, 71
+  69 Set         $0, -1
+  70 Jump        72
+  71 Set         $0, 1
+  72 Return      $0
+  73 Move        $3, $-2
+  74 Call        61, 4, $2
+  75 Move        $4, $-1
+  76 Call        61, 5, $3
+  77 Multiply    $1, $2, $3
+  78 Move        $4, $-2
+  79 Call        61, 5, $3
+  80 Multiply    $2, $-2, $3
+  81 Move        $5, $-1
+  82 Call        61, 6, $4
+  83 Multiply    $3, $-1, $4
+  84 Move        $5, $3
+  85 Call        45, 6, $4
+  86 Set         $5, 0
+  87 Set         $7, -1
+  88 Add         $6, $4, $7
+  89 Set         $8, 0
+  90 LessThan    $7, $6, $8
+  91 JumpIfZero  $7, 94
+  92 Multiply    $0, $5, $1
+  93 Jump        115
+  94 Move        $8, $3
+  95 Move        $9, $6
+  96 Call        15, 10, $7
+  97 LessThan    $8, $2, $7
+  98 JumpIfZero  $8, 100
+  99 Jump        110
+ 100 Negate      $8, $7
+ 101 Add         $2, $2, $8
+ 102 Set         $9, 1
+ 103 Move        $10, $6
+ 104 Call        15, 11, $8
+ 105 Add         $5, $5, $8
+ 106 Set         $8, -1
+ 107 Add         $6, $6, $8
+ 108 Jump        89
+ 109 Jump        115
+ 110 Move        $2, $2
+ 111 Move        $5, $5
+ 112 Set         $8, -1
+ 113 Add         $6, $6, $8
+ 114 Jump        89
+ 115 Return      $0
+ 116 Move        $2, $-2
+ 117 Move        $3, $-1
+ 118 Call        73, 4, $1
+ 119 Multiply    $3, $-1, $1
+ 120 Negate      $2, $3
+ 121 Add         $0, $-2, $2
+ 122 Return      $0
+ 123 Set         $1, 1
+ 124 Move        $2, $-1
+ 125 Equals      $3, $1, $2
+ 126 JumpIfZero  $3, 129
+ 127 Return      $1
+ 128 Jump        147
+ 129 Negate      $8, $1
+ 130 Add         $7, $2, $8
+ 131 Set         $8, 1
+ 132 Add         $5, $7, $8
+ 133 Set         $6, 1
+ 134 Call        27, 7, $4
+ 135 Add         $3, $1, $4
+ 136 Multiply    $5, $3, $3
+ 137 LessThan    $4, $-1, $5
+ 138 JumpIfZero  $4, 144
+ 139 Move        $1, $1
+ 140 Set         $4, -1
+ 141 Add         $2, $3, $4
+ 142 Jump        125
+ 143 Jump        147
+ 144 Move        $1, $3
+ 145 Move        $2, $2
+ 146 Jump        125
+ 147 Return      $0
+ 148 Move        $3, $-1
+ 149 Call        123, 4, $2
+ 150 Set         $3, 1
+ 151 Add         $1, $2, $3
+ 152 Set         $2, 2
+ 153 LessThan    $3, $2, $1
+ 154 JumpIfZero  $3, 167
+ 155 Move        $5, $-1
+ 156 Move        $6, $2
+ 157 Call        116, 7, $4
+ 158 Set         $5, 0
+ 159 Equals      $3, $4, $5
+ 160 JumpIfZero  $3, 163
+ 161 Set         $0, 0
+ 162 Jump        166
+ 163 Set         $3, 1
+ 164 Add         $2, $2, $3
+ 165 Jump        153
+ 166 Jump        168
+ 167 Set         $0, 1
+ 168 Return      $0
+ 169 Set         $2, 1
+ 170 Add         $1, $-1, $2
+ 171 Move        $3, $1
+ 172 Call        148, 4, $2
+ 173 JumpIfZero  $2, 176
+ 174 Return      $1
+ 175 Jump        179
+ 176 Set         $2, 1
+ 177 Add         $1, $1, $2
+ 178 Jump        171
+ 179 Return      $0
+ 180 Move        $1, $-1
+ 181 Call        169, 2, $0
+ 182 Return      $0

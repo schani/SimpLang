@@ -261,70 +261,83 @@ When the "main" program returns, the program ends.
 
 ### Moving data
 
-* `Move` *DST* *SRC*
+#### `Move` *DST* *SRC*
 
 Copies the number in slot *SRC* to slot *DST*.  If *SRC* and *DST* are
 the same slot, there is no effect.
 
-* `Set` *DST* *NUMBER*
+#### `Set` *DST* *NUMBER*
 
 Sets slot *DST* to *NUMBER*.
 
 ### Arithmetic
 
-* `Add` *DST* *SRC1* *SRC2*
+#### `Add` *DST* *SRC1* *SRC2*
 
 Sets the slot *DST* to the sum of the numbers in slots *SRC1* and
 *SRC2*.
 
-* `Multiply` *DST* *SRC1* *SRC2*
+#### `Multiply` *DST* *SRC1* *SRC2*
 
 Sets the slot *DST* to the product of the numbers in slots *SRC1* and
 *SRC2*.
 
-* `Negate` *DST* *SRC*
+#### `Negate` *DST* *SRC*
 
 Sets the slot *DST* to the arithmetic negation of the number in slot
 *SRC*.
 
 ### Control flow
 
-* `Jump` *INS*
+#### `Jump` *INS*
 
 Continues execution at the instruction with index *INS*.
 
-* `JumpIfZero` *SRC* *INS*
+#### `JumpIfZero` *SRC* *INS*
 
 If the number in *SLOT* is zero, continues execution at the
 instruction with index *INS*.  Otherwise continues execution regularly
 at the next instruction.
 
-* `Call` *INS* *NUMBER* *DST*
+#### `Call` *INS* *NUMBER* *DST*
 
-Pushes the program counter (the index of the `Call` instruction) onto
-the call stack, adds *NUMBER* to the value stack pointer, and
-transfers control to the instrution with index *INS*.  The slot *DST*
-is used by the corresponding `Return` instruction to return the
-result.
+* Pushes the program counter (the index of the `Call` instruction) onto
+the call stack
 
-* `Return` *SRC*
+* Adds *NUMBER* to the value stack pointer.
 
-Reads the result from slot *SRC*, pops the index of the corresponding
-`Call` instruction off the call stack, decrements the value stack
-pointer by the *NUMBER* given in that instruction, writes the result
-to the slot *DST* given in that instruction (using the new,
-decremented value stack pointer), and transfers control to the
-instruction after the `Call` instruction (i.e. with the `Call`
-instruction's index plus one).
+* Transfers control to the instrution with index *INS*.
+
+The slot *DST* is used by the corresponding `Return` instruction to
+return the result.
+
+#### `Return` *SRC*
+
+* Reads the result from slot *SRC*.
+
+* If the call stack is empty, end the program and produce that result.
+Otherwise:
+
+* Pops the index of the corresponding `Call` instruction off the call
+stack.
+
+* Decrements the value stack pointer by the *NUMBER* given in that
+instruction
+
+* Writes the result to the slot *DST* given in that instruction (using
+the new, decremented value stack pointer).
+
+* Transfers control to the instruction after the `Call` instruction
+(i.e. with the `Call` instruction's index plus one).
 
 ### Comparison
 
-* `LessThan` *DST* *SRC1* *SRC2*
+#### `LessThan` *DST* *SRC1* *SRC2*
 
 If the number in slot *SRC1* is less than the number in slot *SRC2*,
 sets the slot *DST* to `1`, otherwise to `0`.
 
-* `Equals` *DST* *SRC1* *SRC2*
+#### `Equals` *DST* *SRC1* *SRC2*
 
 If the number in slot *SRC1* is the same as the one in *SRC2*, sets
 the slot *DST* to `1`, otherwise to `0`.
