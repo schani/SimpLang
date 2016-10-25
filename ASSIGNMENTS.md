@@ -569,8 +569,8 @@ in the VM description), and then does the effect of the instruction
 
 using the operations implemented in previous assignment.  Note that
 you don't have to parse the instruction, just write Python code that
-operates on the value array like that instruction would.  Then print
-the value array, to make sure you got the correct result.
+operates on the value array like that instruction would.  Then write
+code that checks that the value array contains the correct values.
 
 ## Assignment 2.3
 
