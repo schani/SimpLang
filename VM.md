@@ -287,6 +287,11 @@ Sets the slot *DST* to the product of the numbers in slots *SRC1* and
 Sets the slot *DST* to the arithmetic negation of the number in slot
 *SRC*.
 
+#### `Not` *DST* *SRC*
+
+If the number in slot *SRC* is `0`, sets the slot *DST* to `1`,
+otherwise sets the slot *DST* to `0`.
+
 ### Control flow
 
 #### `Jump` *INS*
