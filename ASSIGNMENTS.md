@@ -658,3 +658,13 @@ and
 	let main x y z =
 	    y
 	end
+
+## Assignment 3.2
+
+Extend the compiler to handle expressions containing the operators
+`<`, `==`, `+`, `*`, and `-`.
+
+## Assignment 3.3
+
+Extend the compiler to handle expressions containing the operator `!`.
+
