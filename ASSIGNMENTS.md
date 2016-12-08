@@ -662,9 +662,15 @@ and
 ## Assignment 3.2
 
 Extend the compiler to handle expressions containing the operators
-`<`, `==`, `+`, `*`, and `-`.
+`!`, `<`, `==`, `+`, `*`, and `-`.
 
 ## Assignment 3.3
 
-Extend the compiler to handle expressions containing the operator `!`.
+Implement compilation of expressions containing the operators `&&` and
+`||`.  Note that these require short-circuit evaluation, i.e., if the
+result is already determined once the left operand has been evaluated,
+the right operand must not be evaluated.
 
+## Assignment 3.4
+
+Handle `if` expressions in the compiler.
