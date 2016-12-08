@@ -631,3 +631,30 @@ value stack pointer, and which slot to store the result in.
 Your VM is now complete.  Try it out with
 `examples/nextprime-simple.sbc`.  It takes one arguments and produces
 the next prime number after that number.
+
+# Assignment 3
+
+Write a compiler for Simplang that generates code for the virtual
+machine.
+
+There are many ways to compile a Simplang program to VM code, so we
+cannot specify a required output anymore.  The generated VM code must,
+when executed on the VM, produce the same results as the Simplang
+program, given the same inputs.
+
+## Assignment 3.1
+
+Write a compiler for programs that consist of only a `main` function,
+and which returns either an integer literal or one of the arguments.
+
+For examples:
+
+    let main x y z =
+	    123
+	end
+
+and
+
+	let main x y z =
+	    y
+	end
