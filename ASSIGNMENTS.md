@@ -603,8 +603,8 @@ and `789`, the result it prints should be `1378`.
 ## Assignment 2.5
 
 Implement all the other instructions that only operate on the value
-array: `Move`, `Multiply`, `Negate`, `LessThan`, `Equals`.  Write one
-or more test programs to check that they work.
+array: `Move`, `Multiply`, `Negate`, `Not`, `LessThan`, `Equals`.
+Write one or more test programs to check that they work.
 
 ## Assignment 2.6
 
