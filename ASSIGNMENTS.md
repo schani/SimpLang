@@ -674,3 +674,11 @@ the right operand must not be evaluated.
 ## Assignment 3.4
 
 Handle `if` expressions in the compiler.
+
+## Assignment 3.5
+
+Implement `let` in the compiler.
+
+## Assignment 3.6
+
+Implement `loop`.
