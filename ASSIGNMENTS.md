@@ -677,7 +677,7 @@ Handle `if` expressions in the compiler.
 
 ## Assignment 3.5
 
-Implement `let` in the compiler.
+Implement `let` expressions in the compiler.
 
 ## Assignment 3.6
 
