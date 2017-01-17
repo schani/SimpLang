@@ -681,4 +681,15 @@ Implement `let` expressions in the compiler.
 
 ## Assignment 3.6
 
-Implement `loop`.
+Implement `loop` and `recur`.
+
+## Assignment 3.7
+
+Implement calling other functions.
+
+The compiler is now complete.  Make sure it works on all the programs
+in `examples/`.
+
+# Assignment 4
+
+Write a compiler for Simplang that generates x86-64 assembly code.
