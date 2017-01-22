@@ -84,9 +84,17 @@ let rem x y =
   end
 end
 
+let min a b =
+  if a < b then
+    a
+  else
+    b
+  end
+end
+
 let sqrt x =
   loop l = 1 and
-       h = x in
+       h = min (x) (3037000499) in
     if l == h then
       l
     else
