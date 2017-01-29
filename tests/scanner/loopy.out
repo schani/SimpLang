@@ -1,0 +1,14 @@
+keyword let
+identifier a
+operator =
+integer 1
+keyword and
+identifier loopy
+operator =
+identifier a
+operator +
+operator -
+integer 1
+keyword in
+identifier loopy
+keyword end
