@@ -22,36 +22,38 @@ def readtest (f):
     result = readnumbers (f) [0]
     return (args, result)
 
-if len (sys.argv) < 2:
-    sys.stderr.write ("Usage: %s EXE-FILE [ARGS]\n" % sys.argv [0])
+if len (sys.argv) < 3:
+    sys.stderr.write ("Usage: %s TEST-DIR EXECUTABLE [EXECUTABLE-FLAGS]\n" % sys.argv [0])
     exit (1)
 
 num_tests = 0
 failed_tests = 0
 
-exe = sys.argv [1]
-flags = sys.argv [2:]
-for fn in os.listdir ('.'):
+tests_dir = os.path.realpath (os.path.dirname (__file__))
+
+test_dir = os.path.join (tests_dir, sys.argv [1])
+exe = sys.argv [2]
+flags = sys.argv [3:]
+for fn in [os.path.join (test_dir, n) for n in os.listdir (test_dir)]:
     if not os.path.isfile (fn):
         continue
-    fn = os.path.basename (fn)
+    fn_base = os.path.basename (fn)
     if not fn.endswith ('.tests'):
         continue
-    slname = '../examples/%s.sl' % (fn [:-6])
-    print fn
-    f = open (fn, 'r')
-    while True:
-        test = readtest (f)
-        if not test:
-            break
-        num_tests += 1
-        (args, expected) = test
-        print args, expected
-        result = int (subprocess.check_output (['mono', exe] + flags + [slname] + [str (x) for x in args]))
-        if result != expected:
-            print "Failure on %s with %s: expected %d, got %d" % (fn, args, expected, result)
-            failed_tests += 1
-    f.close ()
+    slname = os.path.join (tests_dir, '..', 'examples', '%s.sl' % (fn_base [:-6]))
+    print fn_base
+    with open (fn, 'r') as f:
+        while True:
+            test = readtest (f)
+            if not test:
+                break
+            num_tests += 1
+            (args, expected) = test
+            print args, expected
+            result = int (subprocess.check_output ([exe] + flags + [slname] + [str (x) for x in args]))
+            if result != expected:
+                print "Failure on %s with %s: expected %d, got %d" % (fn, args, expected, result)
+                failed_tests += 1
 
 print "Ran %d tests - %d failures" % (num_tests, failed_tests)
 if failed_tests > 0:
