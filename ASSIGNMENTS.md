@@ -161,6 +161,9 @@ Output:
 
 	3
 
+You'll have an easy time if you write the interpreter as a recursive
+function.
+
 ## Assignment 1.4
 
 Extend the parser to recognize operators, without yet implementing
@@ -230,6 +233,22 @@ Here's how the operators work:
 
 Input:
 
+    (1+2)
+
+Output:
+
+	3
+
+Input:
+
+	(1+-2)
+
+Output:
+
+	-1
+
+Input:
+
     (9223372036854775807+1)
 
 Output:
@@ -280,6 +299,27 @@ The curly braces in the grammar mean that the enclosed sequence can be
 repeated zero or more times, so `x {"and" x}` means `x` or `x "and" x`
 or `x "and" x "and" x`, and so on.
 
+Input:
+
+    let a = 1 and
+        b = (a + 1)
+	in
+	    (a + b)
+	end
+
+Output:
+
+	let
+	    a
+	      1
+	    b
+	      +
+		    a
+			1
+      +
+	    a
+		b
+
 ## Assignment 1.7
 
 Extend the interpreter to handle `let`.
@@ -311,9 +351,10 @@ Output:
 
 	-12
 
-Note that in this example there are three different bindings for `a`,
-each with a different scope.  We can rename them to get an expression
-with the same semantics, to make clear which one is which:
+Note that in this example there are three different variables with the
+same name, `a`, each with a different scope.  We can rename them to
+get an expression with the same semantics, to make clear which one is
+which:
 
 	-let a1 = 10
 	in
@@ -329,7 +370,10 @@ AST to evaluate, but also the "environment" in which to evaluate it
 in.  The environment contains the variable bindings.  For example, the
 expression `(a+b)` evalutes to `3` in the environment `{a=>1, b=>2}`,
 but to `7` in the environment `{a=>3,b=>4}`.  Think about what data
-structure to use for the environment before starting to code.
+structure to use for the environment before starting to code.  It will
+have to be able to handle the introduction of new variables with the
+same name as existing ones, without overwriting the old values,
+because they might be needed later, like in the example above.
 
 ## Assignment 1.8
 
@@ -348,6 +392,18 @@ now:
 	arg = "(" expr ")"
     unop = "!" | "-"
 	binop = "&&" | "||" | "<" | "==" | "+" | "*"
+
+Input:
+
+    loop x=1 in recur (x) end
+
+Output:
+
+    loop
+	    x
+		  1
+	  recur
+	    x
 
 ## Assignment 1.9
 
@@ -370,12 +426,13 @@ gives
     100
 
 If instead `a` is initialized with `1000000` it must not use more
-memory than, as above, with `100`.
+memory than it does with `100`.
 
 The easiest way to achieve this, with a recursive interpreter, is to
 let the interpretation function return either a result, or a value
 that indicates that the innermost `loop` is to be rerun, including the
-new values to be bound.
+new values to be bound.  If your programming language supports
+exceptions, use can also use them instead.
 
 See the [README](README.md) on details of which positions `recur` can
 be used in.
