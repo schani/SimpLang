@@ -119,4 +119,7 @@ arguments.
 
 Run the testsuite with
 
-    cd tests ; ./test.py EXE-FILENAME
+    ./tests/test.py TEST-SUITE YOUR-EXE [YOUR-EXE-ARG ...]
+
+where `TEST-SUITE` is the name of one of the directories in `tests`,
+such as `full`.
