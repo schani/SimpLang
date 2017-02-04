@@ -1,0 +1,6 @@
+keyword let
+identifier main
+identifier x
+operator =
+identifier x
+keyword end

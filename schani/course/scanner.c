@@ -108,6 +108,7 @@ scan (context_t *ctx)
 	if (c == '&' || c == '|') {
 		consume(ctx);
 		error_assert(lookahead(ctx) == c, "invalid token");
+		consume(ctx);
 		token_t t = { c == '&' ? TOKEN_LOGIC_AND : TOKEN_LOGIC_OR };
 		return t;
 	}
