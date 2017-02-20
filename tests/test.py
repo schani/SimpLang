@@ -36,7 +36,7 @@ exe = sys.argv [2]
 flags = sys.argv [3:]
 
 def run_exe(sl, args):
-    return subprocess.check_output ([exe] + flags + [sl] + [str (x) for x in args])
+    return subprocess.check_output ([exe] + flags + [sl] + [str (x) for x in args], universal_newlines=True)
 
 for fn in [os.path.join (test_dir, n) for n in os.listdir (test_dir)]:
     if not os.path.isfile (fn):
@@ -54,15 +54,15 @@ for fn in [os.path.join (test_dir, n) for n in os.listdir (test_dir)]:
     if not os.path.isfile (sl_path):
         sl_path = os.path.join (tests_dir, '..', 'examples', sl_name)
         if not os.path.isfile (sl_path):
-            print "Error: Cannot find SL file for test %s" % fn_base
-    print fn_base
+            print("Error: Cannot find SL file for test %s" % fn_base)
+    print(fn_base)
     if is_outfile:
         with open(fn, 'r') as f:
             expected = f.read()
         num_tests += 1
         result = run_exe(sl_path, [])
         if result != expected:
-            print "Failure on %s: expected \n\n%s\n\ngot\n\n%s\n" % (fn_base, expected, result)
+            print("Failure on %s: expected \n\n%s\n\ngot\n\n%s\n" % (fn_base, expected, result))
             failed_tests += 1
     else:
         with open (fn, 'r') as f:
@@ -72,13 +72,13 @@ for fn in [os.path.join (test_dir, n) for n in os.listdir (test_dir)]:
                     break
                 num_tests += 1
                 (args, expected) = test
-                print args, expected
+                print(args, expected)
                 result = int (run_exe(sl_path, args))
                 if result != expected:
-                    print "Failure on %s with %s: expected %d, got %d" % (fn_base, args, expected, result)
+                    print("Failure on %s with %s: expected %d, got %d" % (fn_base, args, expected, result))
                     failed_tests += 1
 
-print "Ran %d tests - %d failures" % (num_tests, failed_tests)
+print("Ran %d tests - %d failures" % (num_tests, failed_tests))
 if failed_tests > 0:
     exit (1)
 exit (0)
