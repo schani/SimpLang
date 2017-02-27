@@ -89,4 +89,24 @@ error_assert (bool assertion, const char *error)
 	exit(1);
 }
 
+typedef enum {
+	EXPR_INTEGER,
+	EXPR_IF
+} expr_type_t;
+
+typedef struct _expr_t expr_t;
+struct _expr_t {
+	expr_type_t type;
+	union {
+		int64_t i;
+		struct {
+			expr_t *condition;
+			expr_t *consequent;
+			expr_t *alternative;
+		} if_expr;
+	} v;
+};
+
+expr_t* parse_expr (context_t *ctx);
+
 #endif
