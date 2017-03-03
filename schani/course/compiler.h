@@ -109,4 +109,6 @@ struct _expr_t {
 
 expr_t* parse_expr (context_t *ctx);
 
+int64_t eval_expr (expr_t *expr);
+
 #endif

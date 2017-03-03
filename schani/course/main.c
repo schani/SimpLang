@@ -53,6 +53,14 @@ parse_main (context_t *ctx)
 	print_expr(expr, 0);
 }
 
+static void
+eval_main (context_t *ctx)
+{
+	expr_t *expr = parse_expr(ctx);
+	int64_t result = eval_expr(expr);
+	printf("%" PRId64 "\n", result);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -65,7 +73,7 @@ main (int argc, char *argv[])
 
 	scan_init(&ctx, argv[1]);
 
-	parse_main(&ctx);
+	eval_main(&ctx);
 
 	return 0;
 }
