@@ -7,7 +7,7 @@
 #include "compiler.h"
 
 static const char *keyword_names[] = { "let", "and", "in", "if", "then", "else", "recur", "loop", "end", NULL };
-static const char *single_letter_operators = "()!<+*-";
+static const char *single_letter_operators = "()!-<+*";
 
 static token_type_t
 find_keyword (const char *name)
@@ -30,7 +30,7 @@ token_type_keyword_name (token_type_t t)
 const char*
 token_type_operator_name (token_type_t t)
 {
-	static const char *names[] = { "(", ")", "!", "<", "+", "*", "-", "&&", "||", "=", "==" };
+	static const char *names[] = { "(", ")", "!", "-", "<", "+", "*", "&&", "||", "==", "=" };
 
 	assert(token_type_is_operator(t));
 	return names[t - TOKEN_FIRST_OPERATOR];
