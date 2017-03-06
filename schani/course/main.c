@@ -41,6 +41,15 @@ print_expr (expr_t *expr, int indent)
 			print_expr(expr->v.if_expr.consequent, indent + 1);
 			print_expr(expr->v.if_expr.alternative, indent + 1);
 			break;
+		case EXPR_UNARY:
+			printf("%s\n", token_type_operator_name(expr->v.unary.op));
+			print_expr(expr->v.unary.operand, indent + 1);
+			break;
+		case EXPR_BINARY:
+			printf("%s\n", token_type_operator_name(expr->v.binary.op));
+			print_expr(expr->v.binary.left, indent + 1);
+			print_expr(expr->v.binary.right, indent + 1);
+			break;
 		default:
 			assert(false);
 	}
@@ -73,7 +82,9 @@ main (int argc, char *argv[])
 
 	scan_init(&ctx, argv[1]);
 
-	eval_main(&ctx);
+	//scan_main(&ctx);
+	parse_main(&ctx);
+	//eval_main(&ctx);
 
 	return 0;
 }

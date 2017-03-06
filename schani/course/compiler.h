@@ -94,7 +94,9 @@ error_assert (bool assertion, const char *error)
 
 typedef enum {
 	EXPR_INTEGER,
-	EXPR_IF
+	EXPR_IF,
+	EXPR_UNARY,
+	EXPR_BINARY
 } expr_type_t;
 
 typedef struct _expr_t expr_t;
@@ -107,6 +109,15 @@ struct _expr_t {
 			expr_t *consequent;
 			expr_t *alternative;
 		} if_expr;
+		struct {
+			token_type_t op;
+			expr_t *operand;
+		} unary;
+		struct {
+			token_type_t op;
+			expr_t *left;
+			expr_t *right;
+		} binary;
 	} v;
 };
 
