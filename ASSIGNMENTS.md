@@ -184,20 +184,20 @@ Input:
 Output:
 
     if
-	  <
-	    1
-		2
-	  *
-	    3
-		4
-	  +
-	    5
-		!
-		  -
-		    if
-		      7
-			  8
-			  9
+      <
+        1
+        2
+      *
+        3
+        4
+      +
+        5
+        !
+          -
+            if
+              7
+              8
+              9
 
 Again, parse to an abstract syntax tree first, then generate the
 output from the AST.  That will make the next assignment easier.
@@ -309,16 +309,16 @@ Input:
 
 Output:
 
-	let
-	    a
-	      1
-	    b
-	      +
-		    a
-			1
+    let
+        a
+          1
+        b
+          +
+            a
+            1
       +
-	    a
-		b
+        a
+        b
 
 ## Assignment 1.7
 
