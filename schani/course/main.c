@@ -83,8 +83,8 @@ main (int argc, char *argv[])
 	scan_init(&ctx, argv[1]);
 
 	//scan_main(&ctx);
-	parse_main(&ctx);
-	//eval_main(&ctx);
+	//parse_main(&ctx);
+	eval_main(&ctx);
 
 	return 0;
 }
