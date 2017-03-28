@@ -27,19 +27,38 @@ scan_main (context_t *ctx)
 }
 
 static void
-print_expr (expr_t *expr, int indent)
+print_indent (int indent)
 {
 	for (int i = 0; i < indent; i++)
 		printf("  ");
+}
+
+static void
+print_expr (expr_t *expr, int indent)
+{
+	print_indent(indent);
 	switch (expr->type) {
 		case EXPR_INTEGER:
 			printf("%" PRId64 "\n", expr->v.i);
+			break;
+		case EXPR_IDENT:
+			printf("%s\n", expr->v.ident);
 			break;
 		case EXPR_IF:
 			printf("if\n");
 			print_expr(expr->v.if_expr.condition, indent + 1);
 			print_expr(expr->v.if_expr.consequent, indent + 1);
 			print_expr(expr->v.if_expr.alternative, indent + 1);
+			break;
+		case EXPR_LET:
+			printf("let\n");
+			for (int i = 0; i < expr->v.let.n; i++) {
+				binding_t *binding = &expr->v.let.bindings[i];
+				print_indent(indent + 2);
+				printf("%s\n", binding->name);
+				print_expr(binding->expr, indent + 3);
+			}
+			print_expr(expr->v.let.body, indent + 1);
 			break;
 		case EXPR_UNARY:
 			printf("%s\n", token_type_operator_name(expr->v.unary.op));
@@ -83,8 +102,8 @@ main (int argc, char *argv[])
 	scan_init(&ctx, argv[1]);
 
 	//scan_main(&ctx);
-	//parse_main(&ctx);
-	eval_main(&ctx);
+	parse_main(&ctx);
+	//eval_main(&ctx);
 
 	return 0;
 }
