@@ -135,8 +135,15 @@ struct _expr_t {
 	} v;
 };
 
+typedef struct _environment_t
+{
+	char *name;
+	int64_t value;
+	struct _environment_t *next;
+} environment_t;
+
 expr_t* parse_expr (context_t *ctx);
 
-int64_t eval_expr (expr_t *expr);
+int64_t eval_expr (environment_t *env, expr_t *expr);
 
 #endif

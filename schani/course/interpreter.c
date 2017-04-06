@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <assert.h>
+#include <string.h>
 
 #include "compiler.h"
 
@@ -21,21 +22,55 @@ bool_to_int (bool b)
 		return 0;
 }
 
+static int64_t
+env_lookup (environment_t *env, char *name)
+{
+	for (;;) {
+		assert(env != NULL);
+		if (strcmp(env->name, name) == 0)
+			return env->value;
+		env = env->next;
+	}
+}
+
+static environment_t*
+env_bind (environment_t *env, char *name, int64_t value)
+{
+	environment_t *new = malloc(sizeof(environment_t));
+	new->name = name;
+	new->value = value;
+	new->next = env;
+	return new;
+}
+
+static void
+env_free (environment_t *env, environment_t *old)
+{
+	while (env != old) {
+		environment_t *next = env->next;
+		free(env);
+		env = next;
+	}
+}
+
 int64_t
-eval_expr (expr_t *expr)
+eval_expr (environment_t *env, expr_t *expr)
 {
 	switch (expr->type) {
 		case EXPR_INTEGER:
 			return expr->v.i;
 
+		case EXPR_IDENT:
+			return env_lookup(env, expr->v.ident);
+
 		case EXPR_IF:
-			if (eval_expr(expr->v.if_expr.condition))
-				return eval_expr(expr->v.if_expr.consequent);
+			if (eval_expr(env, expr->v.if_expr.condition))
+				return eval_expr(env, expr->v.if_expr.consequent);
 			else
-				return eval_expr(expr->v.if_expr.alternative);
+				return eval_expr(env, expr->v.if_expr.alternative);
 
 		case EXPR_UNARY: {
-			int64_t operand = eval_expr(expr->v.unary.operand);
+			int64_t operand = eval_expr(env, expr->v.unary.operand);
 			switch (expr->v.unary.op) {
 				case TOKEN_NOT:
 					if (operand)
@@ -53,18 +88,18 @@ eval_expr (expr_t *expr)
 		}
 
 		case EXPR_BINARY: {
-			int64_t left = eval_expr(expr->v.binary.left);
+			int64_t left = eval_expr(env, expr->v.binary.left);
 			if (expr->v.binary.op == TOKEN_LOGIC_AND) {
 				if (!left)
 					return 0;
-				return boolify_int(eval_expr(expr->v.binary.right));
+				return boolify_int(eval_expr(env, expr->v.binary.right));
 			}
 			if (expr->v.binary.op == TOKEN_LOGIC_OR) {
 				if (left)
 					return 1;
-				return boolify_int(eval_expr(expr->v.binary.right));
+				return boolify_int(eval_expr(env, expr->v.binary.right));
 			}
-			int64_t right = eval_expr(expr->v.binary.right);
+			int64_t right = eval_expr(env, expr->v.binary.right);
 			switch (expr->v.binary.op) {
 				case TOKEN_LESS:
 					return bool_to_int(left < right);
@@ -82,6 +117,17 @@ eval_expr (expr_t *expr)
 					assert(false);
 			}
 			break;
+		}
+
+		case EXPR_LET: {
+			environment_t *old = env;
+			for (int i = 0; i < expr->v.let.n; i++) {
+				int64_t value = eval_expr(env, expr->v.let.bindings[i].expr);
+				env = env_bind(env, expr->v.let.bindings[i].name, value);
+			}
+			int64_t result = eval_expr(env, expr->v.let.body);
+			env_free(env, old);
+			return result;
 		}
 
 		default:
