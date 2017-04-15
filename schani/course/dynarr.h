@@ -12,20 +12,27 @@ typedef struct {
 	void **data;
 } dynarr_t;
 
-void dynarr_init(dynarr_t *arr, pool_t *pool);
-void dynarr_append(dynarr_t *arr, void *p);
+void dynarr_init (dynarr_t *arr, pool_t *pool);
+void dynarr_append (dynarr_t *arr, void *p);
 
 static inline size_t
-dynarr_length(dynarr_t *arr)
+dynarr_length (dynarr_t *arr)
 {
 	return arr->length;
 }
 
 static inline void*
-dynarr_nth(dynarr_t *arr, size_t i)
+dynarr_nth (dynarr_t *arr, size_t i)
 {
 	assert(i < arr->length);
 	return arr->data[i];
+}
+
+// NOTE: don't use the dynarr after messing with the data
+static inline void**
+dynarr_data (dynarr_t *arr)
+{
+	return arr->data;
 }
 
 #endif

@@ -1,0 +1,5 @@
+loop
+    x
+      1
+  recur
+    x

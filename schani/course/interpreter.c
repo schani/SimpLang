@@ -121,11 +121,11 @@ eval_expr (environment_t *env, expr_t *expr)
 
 		case EXPR_LET: {
 			environment_t *old = env;
-			for (int i = 0; i < expr->v.let.n; i++) {
-				int64_t value = eval_expr(env, expr->v.let.bindings[i].expr);
-				env = env_bind(env, expr->v.let.bindings[i].name, value);
+			for (int i = 0; i < expr->v.let_loop.n; i++) {
+				int64_t value = eval_expr(env, expr->v.let_loop.bindings[i].expr);
+				env = env_bind(env, expr->v.let_loop.bindings[i].name, value);
 			}
-			int64_t result = eval_expr(env, expr->v.let.body);
+			int64_t result = eval_expr(env, expr->v.let_loop.body);
 			env_free(env, old);
 			return result;
 		}

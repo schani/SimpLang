@@ -97,6 +97,8 @@ typedef enum {
 	EXPR_IDENT,
 	EXPR_IF,
 	EXPR_LET,
+	EXPR_LOOP,
+	EXPR_RECUR,
 	EXPR_UNARY,
 	EXPR_BINARY
 } expr_type_t;
@@ -122,7 +124,11 @@ struct _expr_t {
 			int n;
 			binding_t *bindings;
 			expr_t *body;
-		} let;
+		} let_loop;
+		struct {
+			int n;
+			expr_t **args;
+		} recur;
 		struct {
 			token_type_t op;
 			expr_t *operand;
@@ -141,6 +147,8 @@ typedef struct _environment_t
 	int64_t value;
 	struct _environment_t *next;
 } environment_t;
+
+void parser_init (context_t *ctx);
 
 expr_t* parse_expr (context_t *ctx);
 

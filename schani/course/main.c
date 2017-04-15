@@ -51,14 +51,20 @@ print_expr (expr_t *expr, int indent)
 			print_expr(expr->v.if_expr.alternative, indent + 1);
 			break;
 		case EXPR_LET:
-			printf("let\n");
-			for (int i = 0; i < expr->v.let.n; i++) {
-				binding_t *binding = &expr->v.let.bindings[i];
+		case EXPR_LOOP:
+			printf("%s\n", expr->type == EXPR_LET ? "let" : "loop");
+			for (int i = 0; i < expr->v.let_loop.n; i++) {
+				binding_t *binding = &expr->v.let_loop.bindings[i];
 				print_indent(indent + 2);
 				printf("%s\n", binding->name);
 				print_expr(binding->expr, indent + 3);
 			}
-			print_expr(expr->v.let.body, indent + 1);
+			print_expr(expr->v.let_loop.body, indent + 1);
+			break;
+		case EXPR_RECUR:
+			printf("recur\n");
+			for (int i = 0; i < expr->v.recur.n; i++)
+				print_expr(expr->v.recur.args[i], indent + 1);
 			break;
 		case EXPR_UNARY:
 			printf("%s\n", token_type_operator_name(expr->v.unary.op));
@@ -100,10 +106,11 @@ main (int argc, char *argv[])
 	}
 
 	scan_init(&ctx, argv[1]);
+	parser_init(&ctx);
 
 	//scan_main(&ctx);
-	//parse_main(&ctx);
-	eval_main(&ctx);
+	parse_main(&ctx);
+	//eval_main(&ctx);
 
 	return 0;
 }
