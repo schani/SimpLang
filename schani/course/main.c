@@ -109,8 +109,8 @@ main (int argc, char *argv[])
 	parser_init(&ctx);
 
 	//scan_main(&ctx);
-	parse_main(&ctx);
-	//eval_main(&ctx);
+	//parse_main(&ctx);
+	eval_main(&ctx);
 
 	return 0;
 }
