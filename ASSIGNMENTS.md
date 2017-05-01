@@ -549,6 +549,22 @@ within a function).  That's ok.  If you'd like to still be able to use
 those examples, you should preserve the ability to parse an `expr`
 that's not contained in a function.
 
+Input:
+
+    let main a b =
+	    a + b
+    end
+
+Output:
+
+    function
+	    main
+	      a
+		  b
+      +
+	    a
+		b
+
 ## Assignment 1.12
 
 Make your interpreter run the `main` function and pass command line
