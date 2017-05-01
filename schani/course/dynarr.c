@@ -23,3 +23,11 @@ dynarr_append(dynarr_t *arr, void *p)
 
 	arr->data[arr->length++] = p;
 }
+
+void
+dynarr_remove (dynarr_t *arr, size_t i)
+{
+	assert(i < arr->length);
+	memmove(&arr->data[i], &arr->data[i + 1], sizeof(void*) * (arr->length - i - 1));
+	arr->length--;
+}

@@ -36,8 +36,77 @@ expect_token (context_t *ctx, token_type_t type)
 	return t;
 }
 
+static bool
+is_binary_operator (token_type_t t)
+{
+	return t >= TOKEN_FIRST_BINARY_OPERATOR && t <= TOKEN_LAST_BINARY_OPERATOR;
+}
+
+static int
+operator_precedence (token_type_t t)
+{
+	switch (t) {
+		case TOKEN_TIMES:
+			return 0;
+		case TOKEN_PLUS:
+			return 1;
+		case TOKEN_LESS:
+		case TOKEN_EQUALS:
+			return 2;
+		case TOKEN_LOGIC_AND:
+		case TOKEN_LOGIC_OR:
+			return 3;
+		default:
+			assert(false);
+	}
+}
+
+static expr_t* parse_primary (context_t *ctx);
+
 expr_t*
 parse_expr (context_t *ctx)
+{
+	dynarr_t expr_arr;
+	dynarr_t op_arr;
+
+	dynarr_init(&expr_arr, &ctx->pool);
+	dynarr_init(&op_arr, &ctx->pool);
+
+	dynarr_append(&expr_arr, parse_primary(ctx));
+	while (is_binary_operator(lookahead.type)) {
+		dynarr_append(&op_arr, (void*)lookahead.type);
+		consume(ctx);
+		dynarr_append(&expr_arr, parse_primary(ctx));
+	}
+
+	for (int p = 0; p < 4; p++) {
+		int i = 0;
+		while (i < dynarr_length(&op_arr)) {
+			token_type_t op = (token_type_t)dynarr_nth(&op_arr, i);
+			if (operator_precedence(op) != p) {
+				i++;
+				continue;
+			}
+
+			expr_t *expr = alloc_expr(ctx, EXPR_BINARY);
+			expr->v.binary.op = op;
+			expr->v.binary.left = dynarr_nth(&expr_arr, i);
+			expr->v.binary.right = dynarr_nth(&expr_arr, i + 1);
+
+			dynarr_remove(&op_arr, i);
+			dynarr_remove(&expr_arr, i);
+			dynarr_set(&expr_arr, i, expr);
+		}
+	}
+
+	assert(dynarr_length(&op_arr) == 0);
+	assert(dynarr_length(&expr_arr) == 1);
+
+	return dynarr_nth(&expr_arr, 0);
+}
+
+static expr_t*
+parse_primary (context_t *ctx)
 {
 	token_t t = consume(ctx);
 	expr_t *expr;
@@ -118,22 +187,17 @@ parse_expr (context_t *ctx)
 			break;
 		}
 
-			//| unop expr
+			//| unop primary
 		case TOKEN_NOT:
 		case TOKEN_NEGATE:
 			expr = alloc_expr(ctx, EXPR_UNARY);
 			expr->v.unary.op = t.type;
-			expr->v.unary.operand = parse_expr(ctx);
+			expr->v.unary.operand = parse_primary(ctx);
 			break;
 
-			//| "(" expr binop expr ")"
+			//| "(" expr ")"
 		case TOKEN_OPEN_PAREN:
-			expr = alloc_expr(ctx, EXPR_BINARY);
-			expr->v.binary.left = parse_expr(ctx);
-			t = consume(ctx);
-			assert(t.type >= TOKEN_FIRST_BINARY_OPERATOR && t.type <= TOKEN_LAST_BINARY_OPERATOR);
-			expr->v.binary.op = t.type;
-			expr->v.binary.right = parse_expr(ctx);
+			expr = parse_expr(ctx);
 			expect_token(ctx, TOKEN_CLOSE_PAREN);
 			break;
 
