@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "compiler.h"
 
@@ -115,13 +117,38 @@ eval_main (context_t *ctx)
 	printf("%" PRId64 "\n", result);
 }
 
+static int
+eval_function_main (context_t *ctx, int argc, char **argv)
+{
+	function_t *function = parse_function(ctx);
+
+	if (strcmp(function->name, "main") != 0) {
+		fprintf(stderr, "Error: Function must be main.\n");
+		return 1;
+	}
+
+	if (function->n_args != argc) {
+		fprintf(stderr, "Error: main expects %d args, but got %d.\n", function->n_args, argc);
+		return 2;
+	}
+
+	int64_t *args = pool_alloc(&ctx->pool, argc * sizeof(int64_t));
+	for (int i = 0; i < function->n_args; i++)
+		args[i] = (int64_t)strtoll(argv[i], NULL, 10);
+
+	int64_t result = eval_function(function, args);
+	printf("%" PRId64 "\n", result);
+
+	return 0;
+}
+
 int
 main (int argc, char *argv[])
 {
 	context_t ctx;
 
-	if (argc != 2) {
-		fprintf(stderr, "Usage: simplang FILE\n");
+	if (argc < 2) {
+		fprintf(stderr, "Usage: simplang FILE [ARGS]\n");
 		return 1;
 	}
 
@@ -130,8 +157,9 @@ main (int argc, char *argv[])
 
 	//scan_main(&ctx);
 	//parse_main(&ctx);
-	parse_function_main(&ctx);
+	//parse_function_main(&ctx);
 	//eval_main(&ctx);
+	return eval_function_main(&ctx, argc - 2, argv + 2);
 
-	return 0;
+	//return 0;
 }
