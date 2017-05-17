@@ -194,3 +194,14 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 			assert(false);
 	}
 }
+
+int64_t
+eval_function (function_t *function, int64_t *args)
+{
+	environment_t *env = NULL;
+	for (int i = 0; i < function->n_args; i++)
+		env = env_bind(env, function->args[i], args[i]);
+	int64_t result = eval_expr(env, function->body);
+	env_free(env, NULL);
+	return result;
+}

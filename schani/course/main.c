@@ -81,10 +81,30 @@ print_expr (expr_t *expr, int indent)
 }
 
 static void
+print_function (function_t *function)
+{
+	printf("function\n");
+	print_indent(2);
+	printf("%s\n", function->name);
+	for (int i = 0; i < function->n_args; i++) {
+		print_indent(3);
+		printf("%s\n", function->args[i]);
+	}
+	print_expr(function->body, 1);
+}
+
+static void
 parse_main (context_t *ctx)
 {
 	expr_t *expr = parse_expr(ctx);
 	print_expr(expr, 0);
+}
+
+static void
+parse_function_main (context_t *ctx)
+{
+	function_t *function = parse_function(ctx);
+	print_function(function);
 }
 
 static void
@@ -110,7 +130,8 @@ main (int argc, char *argv[])
 
 	//scan_main(&ctx);
 	//parse_main(&ctx);
-	eval_main(&ctx);
+	parse_function_main(&ctx);
+	//eval_main(&ctx);
 
 	return 0;
 }

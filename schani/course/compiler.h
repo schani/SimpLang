@@ -141,6 +141,14 @@ struct _expr_t {
 	} v;
 };
 
+typedef struct
+{
+	char *name;
+	int n_args;
+	char **args;
+	expr_t *body;
+} function_t;
+
 typedef struct _environment_t
 {
 	char *name;
@@ -151,7 +159,9 @@ typedef struct _environment_t
 void parser_init (context_t *ctx);
 
 expr_t* parse_expr (context_t *ctx);
+function_t* parse_function (context_t *ctx);
 
 int64_t eval_expr (environment_t *env, expr_t *expr);
+int64_t eval_function (function_t *function, int64_t *args);
 
 #endif

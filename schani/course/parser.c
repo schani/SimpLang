@@ -207,3 +207,35 @@ parse_primary (context_t *ctx)
 	}
 	return expr;
 }
+
+function_t*
+parse_function (context_t *ctx)
+{
+	token_t t;
+	dynarr_t arr;
+	function_t *function = pool_alloc(&ctx->pool, sizeof(function_t));
+
+	//function = "let" ident params "=" expr "end"
+	//params = ident {ident}
+
+	expect_token(ctx, TOKEN_LET);
+	t = expect_token(ctx, TOKEN_IDENT);
+	function->name = t.v.name;
+
+	dynarr_init(&arr, &ctx->pool);
+	do {
+		t = expect_token(ctx, TOKEN_IDENT);
+		dynarr_append(&arr, t.v.name);
+	} while (lookahead.type == TOKEN_IDENT);
+
+	function->n_args = dynarr_length(&arr);
+	function->args = (char**)dynarr_data(&arr);
+
+	expect_token(ctx, TOKEN_ASSIGN);
+
+	function->body = parse_expr(ctx);
+
+	expect_token(ctx, TOKEN_END);
+
+	return function;
+}
