@@ -608,6 +608,49 @@ grammar:
     unop = "!" | "-"
 	binop = "&&" | "||" | "<" | "==" | "+" | "*"
 
+Input:
+
+	let add a b =
+	  a + b
+	end
+
+	let main a b =
+	  add (a) (b)
+	end
+
+Output:
+
+	function
+		bitset
+		  x
+		  i
+	  loop
+		  x
+			x
+		  i
+			i
+		if
+		  <
+			i
+			63
+		  recur
+			*
+			  x
+			  2
+			+
+			  i
+			  1
+		  <
+			x
+			0
+	function
+		main
+		  x
+		  i
+	  bitset
+		x
+		i
+
 ## Assignment 1.14
 
 Extend the interpreter to correctly process function calls.  In

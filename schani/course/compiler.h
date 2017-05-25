@@ -100,7 +100,8 @@ typedef enum {
 	EXPR_LOOP,
 	EXPR_RECUR,
 	EXPR_UNARY,
-	EXPR_BINARY
+	EXPR_BINARY,
+	EXPR_CALL
 } expr_type_t;
 
 typedef struct _expr_t expr_t;
@@ -130,6 +131,11 @@ struct _expr_t {
 			expr_t **args;
 		} recur;
 		struct {
+			char *name;
+			int n;
+			expr_t **args;
+		} call;
+		struct {
 			token_type_t op;
 			expr_t *operand;
 		} unary;
@@ -141,13 +147,19 @@ struct _expr_t {
 	} v;
 };
 
-typedef struct
+typedef struct _function_t
 {
 	char *name;
 	int n_args;
 	char **args;
 	expr_t *body;
+
+	struct _function_t *next;
 } function_t;
+
+typedef struct {
+	function_t *functions;
+} program_t;
 
 typedef struct _environment_t
 {
@@ -160,6 +172,7 @@ void parser_init (context_t *ctx);
 
 expr_t* parse_expr (context_t *ctx);
 function_t* parse_function (context_t *ctx);
+program_t* parse_program (context_t *ctx);
 
 int64_t eval_expr (environment_t *env, expr_t *expr);
 int64_t eval_function (function_t *function, int64_t *args);

@@ -68,6 +68,11 @@ print_expr (expr_t *expr, int indent)
 			for (int i = 0; i < expr->v.recur.n; i++)
 				print_expr(expr->v.recur.args[i], indent + 1);
 			break;
+		case EXPR_CALL:
+			printf("%s\n", expr->v.call.name);
+			for (int i = 0; i < expr->v.call.n; i++)
+				print_expr(expr->v.call.args[i], indent + 1);
+			break;
 		case EXPR_UNARY:
 			printf("%s\n", token_type_operator_name(expr->v.unary.op));
 			print_expr(expr->v.unary.operand, indent + 1);
@@ -96,6 +101,13 @@ print_function (function_t *function)
 }
 
 static void
+print_program (program_t *prog)
+{
+	for (function_t *func = prog->functions; func != NULL; func = func->next)
+		print_function(func);
+}
+
+static void
 parse_main (context_t *ctx)
 {
 	expr_t *expr = parse_expr(ctx);
@@ -107,6 +119,13 @@ parse_function_main (context_t *ctx)
 {
 	function_t *function = parse_function(ctx);
 	print_function(function);
+}
+
+static void
+parse_program_main (context_t *ctx)
+{
+	program_t *prog = parse_program(ctx);
+	print_program(prog);
 }
 
 static void
@@ -159,7 +178,8 @@ main (int argc, char *argv[])
 	//parse_main(&ctx);
 	//parse_function_main(&ctx);
 	//eval_main(&ctx);
-	return eval_function_main(&ctx, argc - 2, argv + 2);
+	parse_program_main(&ctx);
+	//return eval_function_main(&ctx, argc - 2, argv + 2);
 
 	//return 0;
 }

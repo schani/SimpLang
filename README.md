@@ -67,7 +67,7 @@ condition of an `if`, an argument in a function call, an operand to an
 operator, the right hand side of a `let` or `loop` binding.
 
 Functions can only be used in their own definitions or in later
-definitions.
+definitions.  All functions must have different names.
 
 All arguments to function calls and `recur` must be parenthesized,
 i.e.,

@@ -105,6 +105,22 @@ parse_expr (context_t *ctx)
 	return dynarr_nth(&expr_arr, 0);
 }
 
+static dynarr_t
+parse_args (context_t *ctx)
+{
+	dynarr_t arr;
+
+	dynarr_init(&arr, &ctx->pool);
+
+	do {
+		expect_token(ctx, TOKEN_OPEN_PAREN);
+		dynarr_append(&arr, parse_expr(ctx));
+		expect_token(ctx, TOKEN_CLOSE_PAREN);
+	} while (lookahead.type == TOKEN_OPEN_PAREN);
+
+	return arr;
+}
+
 static expr_t*
 parse_primary (context_t *ctx)
 {
@@ -119,9 +135,20 @@ parse_primary (context_t *ctx)
 			break;
 
 			//| ident
+			//| ident arg {arg}
 		case TOKEN_IDENT:
-			expr = alloc_expr(ctx, EXPR_IDENT);
-			expr->v.ident = t.v.name;
+			if (lookahead.type == TOKEN_OPEN_PAREN) {
+				expr = alloc_expr(ctx, EXPR_CALL);
+				expr->v.call.name = t.v.name;
+
+				dynarr_t arr = parse_args(ctx);
+
+				expr->v.call.n = dynarr_length(&arr);
+				expr->v.call.args = (expr_t**)dynarr_data(&arr);
+			} else {
+				expr = alloc_expr(ctx, EXPR_IDENT);
+				expr->v.ident = t.v.name;
+			}
 			break;
 
 			//| "if" expr "then" expr "else" expr "end"
@@ -171,19 +198,15 @@ parse_primary (context_t *ctx)
 			break;
 		}
 
-			//| "recur" arg {arg}
+			//| ("recur" | ident) arg {arg}
 			//arg = "(" expr ")"
 		case TOKEN_RECUR: {
-			dynarr_t arr;
-			dynarr_init(&arr, &ctx->pool);
-			do {
-				expect_token(ctx, TOKEN_OPEN_PAREN);
-				dynarr_append(&arr, parse_expr(ctx));
-				expect_token(ctx, TOKEN_CLOSE_PAREN);
-			} while (lookahead.type == TOKEN_OPEN_PAREN);
+			dynarr_t arr = parse_args(ctx);
+
 			expr = alloc_expr(ctx, EXPR_RECUR);
 			expr->v.recur.n = dynarr_length(&arr);
 			expr->v.recur.args = (expr_t**)dynarr_data(&arr);
+
 			break;
 		}
 
@@ -208,6 +231,8 @@ parse_primary (context_t *ctx)
 	return expr;
 }
 
+//function = "let" ident params "=" expr "end"
+//params = ident {ident}
 function_t*
 parse_function (context_t *ctx)
 {
@@ -215,8 +240,7 @@ parse_function (context_t *ctx)
 	dynarr_t arr;
 	function_t *function = pool_alloc(&ctx->pool, sizeof(function_t));
 
-	//function = "let" ident params "=" expr "end"
-	//params = ident {ident}
+	function->next = NULL;
 
 	expect_token(ctx, TOKEN_LET);
 	t = expect_token(ctx, TOKEN_IDENT);
@@ -238,4 +262,27 @@ parse_function (context_t *ctx)
 	expect_token(ctx, TOKEN_END);
 
 	return function;
+}
+
+//program = function {function}
+program_t*
+parse_program (context_t *ctx)
+{
+	function_t *first = NULL;
+	function_t *last = NULL;
+
+	do {
+		function_t *func = parse_function(ctx);
+		if (last == NULL) {
+			first = last = func;
+		} else {
+			last->next = func;
+			last = func;
+		}
+	} while (lookahead.type != TOKEN_EOF);
+
+	program_t *prog = pool_alloc(&ctx->pool, sizeof(program_t));
+	prog->functions = first;
+
+	return prog;
 }
