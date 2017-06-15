@@ -179,4 +179,14 @@ function_t* lookup_function (program_t *prog, char *name);
 int64_t eval_expr (program_t *program, environment_t *env, expr_t *expr);
 int64_t eval_function (program_t *program, function_t *function, int64_t *args);
 
+typedef struct
+{
+	int64_t *value_array;
+	size_t array_size;
+	size_t stack_pointer;
+} vm_t;
+
+void vm_init (vm_t *vm, size_t stack_size);
+void vm_test_value_stack (vm_t *vm);
+
 #endif

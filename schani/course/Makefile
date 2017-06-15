@@ -1,4 +1,4 @@
-SOURCES := pools.c dynstring.c dynarr.c main.c scanner.c parser.c interpreter.c
+SOURCES := pools.c dynstring.c dynarr.c main.c scanner.c parser.c interpreter.c vm.c
 HEADERS := pools.h dynstring.h dynarr.h compiler.h
 
 simplang : $(SOURCES) $(HEADERS)

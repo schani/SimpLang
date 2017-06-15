@@ -162,9 +162,18 @@ eval_program_main (context_t *ctx, int argc, char **argv)
 	return 0;
 }
 
+static void
+vm_main (void)
+{
+	vm_t vm;
+	vm_init(&vm, 32768);
+	vm_test_value_stack(&vm);
+}
+
 int
 main (int argc, char *argv[])
 {
+/*
 	context_t ctx;
 
 	if (argc < 2) {
@@ -174,6 +183,7 @@ main (int argc, char *argv[])
 
 	scan_init(&ctx, argv[1]);
 	parser_init(&ctx);
+*/
 
 	//scan_main(&ctx);
 	//parse_main(&ctx);
@@ -182,5 +192,7 @@ main (int argc, char *argv[])
 	//parse_program_main(&ctx);
 	return eval_program_main(&ctx, argc - 2, argv + 2);
 
-	//return 0;
+	vm_main();
+
+	return 0;
 }
