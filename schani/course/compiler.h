@@ -174,7 +174,9 @@ expr_t* parse_expr (context_t *ctx);
 function_t* parse_function (context_t *ctx);
 program_t* parse_program (context_t *ctx);
 
-int64_t eval_expr (environment_t *env, expr_t *expr);
-int64_t eval_function (function_t *function, int64_t *args);
+function_t* lookup_function (program_t *prog, char *name);
+
+int64_t eval_expr (program_t *program, environment_t *env, expr_t *expr);
+int64_t eval_function (program_t *program, function_t *function, int64_t *args);
 
 #endif

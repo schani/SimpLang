@@ -132,17 +132,18 @@ static void
 eval_main (context_t *ctx)
 {
 	expr_t *expr = parse_expr(ctx);
-	int64_t result = eval_expr(NULL, expr);
+	int64_t result = eval_expr(NULL, NULL, expr);
 	printf("%" PRId64 "\n", result);
 }
 
 static int
-eval_function_main (context_t *ctx, int argc, char **argv)
+eval_program_main (context_t *ctx, int argc, char **argv)
 {
-	function_t *function = parse_function(ctx);
+	program_t *program = parse_program(ctx);
+	function_t *function = lookup_function(program, "main");
 
-	if (strcmp(function->name, "main") != 0) {
-		fprintf(stderr, "Error: Function must be main.\n");
+	if (function == NULL) {
+		fprintf(stderr, "Error: Function main must be defined.\n");
 		return 1;
 	}
 
@@ -155,7 +156,7 @@ eval_function_main (context_t *ctx, int argc, char **argv)
 	for (int i = 0; i < function->n_args; i++)
 		args[i] = (int64_t)strtoll(argv[i], NULL, 10);
 
-	int64_t result = eval_function(function, args);
+	int64_t result = eval_function(program, function, args);
 	printf("%" PRId64 "\n", result);
 
 	return 0;
@@ -178,8 +179,8 @@ main (int argc, char *argv[])
 	//parse_main(&ctx);
 	//parse_function_main(&ctx);
 	//eval_main(&ctx);
-	parse_program_main(&ctx);
-	//return eval_function_main(&ctx, argc - 2, argv + 2);
+	//parse_program_main(&ctx);
+	return eval_program_main(&ctx, argc - 2, argv + 2);
 
 	//return 0;
 }

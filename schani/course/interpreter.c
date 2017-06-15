@@ -80,16 +80,34 @@ env_free (environment_t *env, environment_t *old)
 	}
 }
 
-static intp_result_t eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *loop_env);
+function_t*
+lookup_function (program_t *prog, char *name)
+{
+	for (function_t *func = prog->functions; func != NULL; func = func->next) {
+		if (strcmp(func->name, name) == 0)
+			return func;
+	}
+	return NULL;
+}
+
+static int64_t
+call_function (program_t *prog, char *name, int64_t *args)
+{
+	function_t *func = lookup_function(prog, name);
+	assert(func != NULL);
+	return eval_function(prog, func, args);
+}
+
+static intp_result_t eval (program_t *prog, environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *loop_env);
 
 int64_t
-eval_expr (environment_t *env, expr_t *expr)
+eval_expr (program_t *prog, environment_t *env, expr_t *expr)
 {
-	return int_result(eval(env, expr, NULL, NULL));
+	return int_result(eval(prog, env, expr, NULL, NULL));
 }
 
 static intp_result_t
-eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *loop_env)
+eval (program_t *prog, environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *loop_env)
 {
 	switch (expr->type) {
 		case EXPR_INTEGER:
@@ -99,13 +117,13 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 			return make_int_result(env_lookup(env, expr->v.ident));
 
 		case EXPR_IF:
-			if (eval_expr(env, expr->v.if_expr.condition))
-				return eval(env, expr->v.if_expr.consequent, innermost_loop, loop_env);
+			if (eval_expr(prog, env, expr->v.if_expr.condition))
+				return eval(prog, env, expr->v.if_expr.consequent, innermost_loop, loop_env);
 			else
-				return eval(env, expr->v.if_expr.alternative, innermost_loop, loop_env);
+				return eval(prog, env, expr->v.if_expr.alternative, innermost_loop, loop_env);
 
 		case EXPR_UNARY: {
-			int64_t operand = eval_expr(env, expr->v.unary.operand);
+			int64_t operand = eval_expr(prog, env, expr->v.unary.operand);
 			switch (expr->v.unary.op) {
 				case TOKEN_NOT:
 					if (operand)
@@ -123,18 +141,18 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 		}
 
 		case EXPR_BINARY: {
-			int64_t left = eval_expr(env, expr->v.binary.left);
+			int64_t left = eval_expr(prog, env, expr->v.binary.left);
 			if (expr->v.binary.op == TOKEN_LOGIC_AND) {
 				if (!left)
 					return make_int_result(0);
-				return boolify_int(eval_expr(env, expr->v.binary.right));
+				return boolify_int(eval_expr(prog, env, expr->v.binary.right));
 			}
 			if (expr->v.binary.op == TOKEN_LOGIC_OR) {
 				if (left)
 					return make_int_result(1);
-				return boolify_int(eval_expr(env, expr->v.binary.right));
+				return boolify_int(eval_expr(prog, env, expr->v.binary.right));
 			}
-			int64_t right = eval_expr(env, expr->v.binary.right);
+			int64_t right = eval_expr(prog, env, expr->v.binary.right);
 			switch (expr->v.binary.op) {
 				case TOKEN_LESS:
 					return bool_to_int(left < right);
@@ -157,10 +175,10 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 		case EXPR_LET: {
 			environment_t *old = env;
 			for (int i = 0; i < expr->v.let_loop.n; i++) {
-				int64_t value = eval_expr(env, expr->v.let_loop.bindings[i].expr);
+				int64_t value = eval_expr(prog, env, expr->v.let_loop.bindings[i].expr);
 				env = env_bind(env, expr->v.let_loop.bindings[i].name, value);
 			}
-			intp_result_t result = eval(env, expr->v.let_loop.body, innermost_loop, loop_env);
+			intp_result_t result = eval(prog, env, expr->v.let_loop.body, innermost_loop, loop_env);
 			env_free(env, old);
 			return result;
 		}
@@ -168,11 +186,11 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 		case EXPR_LOOP: {
 			environment_t *old = env;
 			for (int i = 0; i < expr->v.let_loop.n; i++) {
-				int64_t value = eval_expr(env, expr->v.let_loop.bindings[i].expr);
+				int64_t value = eval_expr(prog, env, expr->v.let_loop.bindings[i].expr);
 				env = env_bind(env, expr->v.let_loop.bindings[i].name, value);
 			}
 			for (;;) {
-				intp_result_t result = eval(env, expr->v.let_loop.body, expr, old);
+				intp_result_t result = eval(prog, env, expr->v.let_loop.body, expr, old);
 				env_free(env, old);
 				if (result.loop_env == NULL)
 					return result;
@@ -184,10 +202,17 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 			assert(innermost_loop != NULL && innermost_loop->type == EXPR_LOOP);
 			assert(expr->v.recur.n == innermost_loop->v.let_loop.n);
 			for (int i = 0; i < expr->v.recur.n; i++) {
-				int64_t value = eval_expr(env, expr->v.recur.args[i]);
+				int64_t value = eval_expr(prog, env, expr->v.recur.args[i]);
 				loop_env = env_bind(loop_env, innermost_loop->v.let_loop.bindings[i].name, value);
 			}
 			return make_recur_result(loop_env);
+		}
+
+		case EXPR_CALL: {
+			int64_t args[expr->v.call.n];
+			for (int i = 0; i < expr->v.call.n; i++)
+				args[i] = eval_expr(prog, env, expr->v.call.args[i]);
+			return make_int_result(call_function(prog, expr->v.call.name, args));
 		}
 
 		default:
@@ -196,12 +221,12 @@ eval (environment_t *env, expr_t *expr, expr_t *innermost_loop, environment_t *l
 }
 
 int64_t
-eval_function (function_t *function, int64_t *args)
+eval_function (program_t *prog, function_t *function, int64_t *args)
 {
 	environment_t *env = NULL;
 	for (int i = 0; i < function->n_args; i++)
 		env = env_bind(env, function->args[i], args[i]);
-	int64_t result = eval_expr(env, function->body);
+	int64_t result = eval_expr(prog, env, function->body);
 	env_free(env, NULL);
 	return result;
 }
