@@ -137,7 +137,7 @@ eval_main (context_t *ctx)
 }
 
 static int64_t*
-parse_cmdline_args (context_t *ctx, int argc, char **argv)
+parse_cmdline_args (context_t *ctx, int argc, const char **argv)
 {
 	int64_t *args = pool_alloc(&ctx->pool, argc * sizeof(int64_t));
 	for (int i = 0; i < argc; i++)
@@ -146,7 +146,7 @@ parse_cmdline_args (context_t *ctx, int argc, char **argv)
 }
 
 static int
-eval_program_main (context_t *ctx, int argc, char **argv)
+eval_program_main (context_t *ctx, int argc, const char **argv)
 {
 	program_t *program = parse_program(ctx);
 	function_t *function = lookup_function(program, "main");
@@ -177,21 +177,19 @@ vm_test_main (void)
 }
 
 static int
-vm_main (context_t *ctx, int argc, char **argv)
+vm_main (context_t *ctx, const char *filename, int argc, const char **argv)
 {
-	assert(argc >= 3);
+	//assert(argc >= 3);
 	int64_t *args = parse_cmdline_args(ctx, argc, argv);
 	vm_t vm;
 	vm_init(&vm, 32768);
+	vm_load(&vm, filename);
 	vm_push_args(&vm, argc, args);
-	int64_t result = vm_assignment_2_2(&vm);
-	printf("%s + %s = %" PRId64 "\n", argv[argc - 3], argv[argc - 2], result);
-	assert(args[argc - 3] + args[argc - 2] == result);
 	return 0;
 }
 
 int
-main (int argc, char *argv[])
+main (int argc, const char *argv[])
 {
 	context_t ctx;
 	pool_init(&ctx.pool);
@@ -214,7 +212,7 @@ main (int argc, char *argv[])
 	//return eval_program_main(&ctx, argc - 2, argv + 2);
 
 	//vm_test_main();
-	return vm_main(&ctx, argc - 1, argv + 1);
+	return vm_main(&ctx, argv[1], argc - 2, argv + 2);
 
 	return 0;
 }

@@ -179,16 +179,51 @@ function_t* lookup_function (program_t *prog, char *name);
 int64_t eval_expr (program_t *program, environment_t *env, expr_t *expr);
 int64_t eval_function (program_t *program, function_t *function, int64_t *args);
 
+// NOTE: keep in sync with which_opcode in vm.c!
+typedef enum {
+	VM_OP_MOVE,
+	VM_OP_SET,
+	VM_OP_ADD,
+	VM_OP_MULTIPLY,
+	VM_OP_NEGATE,
+	VM_OP_NOT,
+	VM_OP_JUMP,
+	VM_OP_JUMP_IF_ZERO,
+	VM_OP_CALL,
+	VM_OP_RETURN,
+	VM_OP_LESS_THAN,
+	VM_OP_EQUALS
+} vm_opcode_t;
+
+typedef struct
+{
+	vm_opcode_t opcode;
+	union {
+		struct {
+			int32_t arg;
+			int64_t imm;
+		} imm;
+		struct {
+			int32_t arg1;
+			int32_t arg2;
+			int32_t arg3;
+		} slot;
+	} args;
+} vm_ins_t;
+
 typedef struct
 {
 	int64_t *value_array;
 	size_t array_size;
 	size_t stack_pointer;
+
+	int32_t num_instructions;
+	vm_ins_t *instructions;
 } vm_t;
 
 void vm_init (vm_t *vm, size_t stack_size);
+void vm_load (vm_t *vm, const char *filename);
 void vm_test_value_stack (vm_t *vm);
 void vm_push_args (vm_t *vm, int argc, int64_t *args);
-int64_t vm_assignment_2_2 (vm_t *vm);
 
 #endif
