@@ -136,6 +136,15 @@ eval_main (context_t *ctx)
 	printf("%" PRId64 "\n", result);
 }
 
+static int64_t*
+parse_cmdline_args (context_t *ctx, int argc, char **argv)
+{
+	int64_t *args = pool_alloc(&ctx->pool, argc * sizeof(int64_t));
+	for (int i = 0; i < argc; i++)
+		args[i] = (int64_t)strtoll(argv[i], NULL, 10);
+	return args;
+}
+
 static int
 eval_program_main (context_t *ctx, int argc, char **argv)
 {
@@ -152,10 +161,7 @@ eval_program_main (context_t *ctx, int argc, char **argv)
 		return 2;
 	}
 
-	int64_t *args = pool_alloc(&ctx->pool, argc * sizeof(int64_t));
-	for (int i = 0; i < function->n_args; i++)
-		args[i] = (int64_t)strtoll(argv[i], NULL, 10);
-
+	int64_t *args = parse_cmdline_args(ctx, function->n_args, argv);
 	int64_t result = eval_function(program, function, args);
 	printf("%" PRId64 "\n", result);
 
@@ -163,19 +169,34 @@ eval_program_main (context_t *ctx, int argc, char **argv)
 }
 
 static void
-vm_main (void)
+vm_test_main (void)
 {
 	vm_t vm;
 	vm_init(&vm, 32768);
 	vm_test_value_stack(&vm);
 }
 
+static int
+vm_main (context_t *ctx, int argc, char **argv)
+{
+	assert(argc >= 3);
+	int64_t *args = parse_cmdline_args(ctx, argc, argv);
+	vm_t vm;
+	vm_init(&vm, 32768);
+	vm_push_args(&vm, argc, args);
+	int64_t result = vm_assignment_2_2(&vm);
+	printf("%s + %s = %" PRId64 "\n", argv[argc - 3], argv[argc - 2], result);
+	assert(args[argc - 3] + args[argc - 2] == result);
+	return 0;
+}
+
 int
 main (int argc, char *argv[])
 {
-/*
 	context_t ctx;
+	pool_init(&ctx.pool);
 
+/*
 	if (argc < 2) {
 		fprintf(stderr, "Usage: simplang FILE [ARGS]\n");
 		return 1;
@@ -190,9 +211,10 @@ main (int argc, char *argv[])
 	//parse_function_main(&ctx);
 	//eval_main(&ctx);
 	//parse_program_main(&ctx);
-	return eval_program_main(&ctx, argc - 2, argv + 2);
+	//return eval_program_main(&ctx, argc - 2, argv + 2);
 
-	vm_main();
+	//vm_test_main();
+	return vm_main(&ctx, argc - 1, argv + 1);
 
 	return 0;
 }

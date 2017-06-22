@@ -188,5 +188,7 @@ typedef struct
 
 void vm_init (vm_t *vm, size_t stack_size);
 void vm_test_value_stack (vm_t *vm);
+void vm_push_args (vm_t *vm, int argc, int64_t *args);
+int64_t vm_assignment_2_2 (vm_t *vm);
 
 #endif

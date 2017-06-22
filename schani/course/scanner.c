@@ -53,7 +53,6 @@ bool
 scan_init (context_t *ctx, const char *filename)
 {
 	bool ok;
-	pool_init(&ctx->pool);
 	ctx->file = fopen(filename, "r");
 	assert(ctx->file);
 	ok = consume(ctx);
