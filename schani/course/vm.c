@@ -207,9 +207,16 @@ vm_run (vm_t *vm)
 				tmp2 = vs_load(vm, ins->args.slot.arg3);
 				vs_store(vm, ins->args.slot.arg1, tmp == tmp2 ? 1 : 0);
 				break;
-
 			case VM_OP_JUMP:
+				pc = ins->args.slot.arg1;
+				continue;
 			case VM_OP_JUMP_IF_ZERO:
+				tmp = vs_load(vm, ins->args.slot.arg1);
+				if (tmp == 0) {
+					pc = ins->args.slot.arg2;
+					continue;
+				}
+				break;
 			case VM_OP_CALL:
 				assert(false);
 				return 0;
