@@ -185,6 +185,8 @@ vm_main (context_t *ctx, const char *filename, int argc, const char **argv)
 	vm_init(&vm, 32768);
 	vm_load(&vm, filename);
 	vm_push_args(&vm, argc, args);
+	int64_t result = vm_run(&vm);
+	printf("%" PRId64 "\n", result);
 	return 0;
 }
 
