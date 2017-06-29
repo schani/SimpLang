@@ -307,7 +307,7 @@ at the next instruction.
 #### `Call` *INS* *NUMBER* *DST*
 
 * Pushes the program counter (the index of the `Call` instruction) onto
-the call stack
+the call stack.
 
 * Adds *NUMBER* to the value stack pointer.
 
