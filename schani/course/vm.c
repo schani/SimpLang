@@ -38,13 +38,37 @@ vs_pop (vm_t *vm, int64_t n_slots)
 	vm->stack_pointer -= n_slots;
 }
 
+static inline void
+cs_push (vm_t *vm, int32_t pc)
+{
+	assert(vm->call_stack_pointer < vm->call_stack_size);
+	vm->call_stack[vm->call_stack_pointer++] = pc;
+}
+
+static inline bool
+cs_is_empty (vm_t *vm)
+{
+	return vm->call_stack_pointer == 0;
+}
+
+static inline int32_t
+cs_pop (vm_t *vm)
+{
+	assert(!cs_is_empty(vm));
+	return vm->call_stack[--vm->call_stack_pointer];
+}
+
 void
-vm_init (vm_t *vm, size_t stack_size)
+vm_init (vm_t *vm, size_t stack_size, size_t call_stack_size)
 {
 	vm->value_array = calloc(stack_size, sizeof(int64_t));
 	assert(vm->value_array);
 	vm->array_size = stack_size;
 	vm->stack_pointer = 0;
+
+	vm->call_stack = calloc(call_stack_size, sizeof(int32_t));
+	vm->call_stack_size = call_stack_size;
+	vm->call_stack_pointer = 0;
 }
 
 static char*
@@ -180,7 +204,14 @@ vm_run (vm_t *vm)
 				break;
 			case VM_OP_RETURN:
 				tmp = vs_load(vm, ins->args.slot.arg1);
-				return tmp;
+				if (cs_is_empty(vm))
+					return tmp;
+				pc = cs_pop(vm);
+				ins = &vm->instructions[pc];
+				assert(ins->opcode == VM_OP_CALL);
+				vs_pop(vm, ins->args.slot.arg2);
+				vs_store(vm, ins->args.slot.arg3, tmp);
+				break;
 			case VM_OP_MOVE:
 				tmp = vs_load(vm, ins->args.slot.arg2);
 				vs_store(vm, ins->args.slot.arg1, tmp);
@@ -218,8 +249,10 @@ vm_run (vm_t *vm)
 				}
 				break;
 			case VM_OP_CALL:
-				assert(false);
-				return 0;
+				cs_push(vm, pc);
+				vs_push(vm, ins->args.slot.arg2);
+				pc = ins->args.slot.arg1;
+				continue;
 
 			default:
 				assert(false);

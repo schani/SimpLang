@@ -172,7 +172,7 @@ static void
 vm_test_main (void)
 {
 	vm_t vm;
-	vm_init(&vm, 32768);
+	vm_init(&vm, 32768, 1024);
 	vm_test_value_stack(&vm);
 }
 
@@ -182,7 +182,7 @@ vm_main (context_t *ctx, const char *filename, int argc, const char **argv)
 	//assert(argc >= 3);
 	int64_t *args = parse_cmdline_args(ctx, argc, argv);
 	vm_t vm;
-	vm_init(&vm, 32768);
+	vm_init(&vm, 32768, 1024);
 	vm_load(&vm, filename);
 	vm_push_args(&vm, argc, args);
 	int64_t result = vm_run(&vm);

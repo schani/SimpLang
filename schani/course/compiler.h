@@ -219,9 +219,13 @@ typedef struct
 
 	int32_t num_instructions;
 	vm_ins_t *instructions;
+
+	int32_t *call_stack;
+	size_t call_stack_size;
+	size_t call_stack_pointer;
 } vm_t;
 
-void vm_init (vm_t *vm, size_t stack_size);
+void vm_init (vm_t *vm, size_t stack_size, size_t call_stack_size);
 void vm_load (vm_t *vm, const char *filename);
 void vm_test_value_stack (vm_t *vm);
 void vm_push_args (vm_t *vm, int argc, int64_t *args);
